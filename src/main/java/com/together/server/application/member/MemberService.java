@@ -22,7 +22,8 @@ public class MemberService {
 
         return new MemberInfoResponse(
                 member.getId(),
-                member.getUsername(),
+                member.getEmail(),
+                member.getNickname(),
                 member.getCreatedAt()
         );
     }

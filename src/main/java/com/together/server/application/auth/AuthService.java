@@ -28,12 +28,12 @@ public class AuthService {
                 .findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. 사용자 식별자: %s".formatted(id)));
 
-        return new MemberDetailsResponse(member.getId(), member.getUsername(), member.getCreatedAt());
+        return new MemberDetailsResponse(member.getId(), member.getEmail(), member.getNickname(), member.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
-        Member member = getByUsername(request.username());
+        Member member = getByEmail(request.email());
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
             throw new CoreException(ErrorType.MEMBER_PASSWORD_MISMATCH);
@@ -45,20 +45,20 @@ public class AuthService {
 
     @Transactional
     public String register(RegisterRequest request) {
-        if (memberRepository.existsByUsername(request.username())) {
+        if (memberRepository.existsByEmail(request.email())) {
             throw new CoreException(ErrorType.MEMBER_USERNAME_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        Member member = new Member(request.username(), encodedPassword);
+        Member member = new Member(request.email(), request.nickname(), encodedPassword);
         Member savedMember = memberRepository.save(member);
 
         return savedMember.getId();
     }
 
-    private Member getByUsername(String username) {
+    private Member getByEmail(String email) {
         return memberRepository
-                .findByUsername(username)
+                .findByEmail(email)
                 .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
     }
 }

@@ -13,14 +13,18 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Member extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "member_email", nullable = false, unique = true)
+    private String email;
 
-    @Column(nullable = false)
+    @Column(name = "member_password", nullable = false)
     private String password;
 
-    public Member(String username, String password) {
-        this.username = username;
+    @Column(name = "member_nickname", nullable = false)
+    private String nickname;
+
+    public Member(String email, String password, String nickname) {
+        this.email = email;
         this.password = password;
+        this.nickname = nickname;
     }
 }
