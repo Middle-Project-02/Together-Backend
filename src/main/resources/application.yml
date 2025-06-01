@@ -17,6 +17,17 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
       auto-commit: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 604b523d970a77490059b67f01f2e05c
+            redirect-uri: http://localhost:8080/api/auth/login/kakao
+            authorization-grant-type: authorization_code
+            scope:
+              - profile_nickname
+              - account_email
 
   jpa:
     open-in-view: false
@@ -32,6 +43,7 @@ security:
   user:
     name: together
     password: together
+
 
   jwt:
     secret-key: security-1234567890-!@#$%^&*()-security-1234567890

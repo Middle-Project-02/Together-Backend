@@ -36,6 +36,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.10'
 
+
     // jwt
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-gson:${jjwtVersion}"

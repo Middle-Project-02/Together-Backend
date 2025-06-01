@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String memberId = extractMemberId(token);
         MemberDetailsResponse memberInfo = fetchMemberInfo(memberId);
 
-        Authentication authentication = JwtAuthentication.of(memberInfo.id());
+        Authentication authentication = JwtAuthentication.of(String.valueOf(memberInfo.id()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

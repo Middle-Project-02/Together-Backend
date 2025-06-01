@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -22,9 +23,9 @@ public class Member extends BaseEntity {
     @Column(name = "member_nickname", nullable = false)
     private String nickname;
 
-    public Member(String email, String password, String nickname) {
+    public Member(String email, String nickname, String password) {
         this.email = email;
-        this.password = password;
         this.nickname = nickname;
+        this.password = password;
     }
 }
