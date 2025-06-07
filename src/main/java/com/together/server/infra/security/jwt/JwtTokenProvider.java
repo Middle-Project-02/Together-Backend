@@ -27,15 +27,29 @@ public class JwtTokenProvider implements TokenProvider {
 
     private final SecretKey key;
     private final Long expirationTime;
+    private final Long refreshTokenTime;
 
     public JwtTokenProvider(JwtTokenProperties properties) {
         this.key = Keys.hmacShaKeyFor(properties.secretKey().getBytes(StandardCharsets.UTF_8));
         this.expirationTime = properties.expirationTime();
+        this.refreshTokenTime = properties.refreshTokenTime();
     }
 
     public String createToken(String memberId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationTime);
+
+        return Jwts.builder()
+                .subject(memberId)
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(key)
+                .compact();
+    }
+
+    public String createRefreshToken(String memberId) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + refreshTokenTime);
 
         return Jwts.builder()
                 .subject(memberId)
@@ -72,5 +86,15 @@ public class JwtTokenProvider implements TokenProvider {
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token);
+    }
+
+    @Override
+    public boolean validateToken(String token) {
+        try {
+            getClaimsJws(token); // 파싱이 되면 유효한 토큰
+            return true;
+        } catch (BlankTokenException | TokenExpiredException | InvalidTokenException e) {
+            return false;
+        }
     }
 }

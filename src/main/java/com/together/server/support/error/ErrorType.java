@@ -17,7 +17,8 @@ public enum ErrorType {
     MEMBER_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.", LogLevel.WARN),
     KAKAO_USERINFO_INCOMPLETE(HttpStatus.BAD_REQUEST, "카카오 로그인 중 에러가 발생했습니다.", LogLevel.WARN),
     KAKAO_TOKEN_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "카카오 토큰 요청 중 오류가 발생했습니다.", LogLevel.WARN),
-    KAKAO_USERINFO_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "카카오 사용자 정보 요청 중 오류가 발생했습니다.", LogLevel.WARN);
+    KAKAO_USERINFO_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "카카오 사용자 정보 요청 중 오류가 발생했습니다.", LogLevel.WARN),
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰이 유요하지 않습니다.", LogLevel.WARN);
 
 
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;

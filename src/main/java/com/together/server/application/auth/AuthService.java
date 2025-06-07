@@ -39,16 +39,18 @@ public class AuthService {
     public TokenResponse login(LoginRequest request) {
         Member member = getByEmail(request.email());
 
-        if (member.getPassword() == "KAKAO_PASSWORD") {
-            throw new CoreException(ErrorType.SOCIAL_LOGIN_ONLY); // 소셜 로그인으로만 가능한 계정
+        if (member.getPassword().equals("KAKAO_PASSWORD")) {
+            throw new CoreException(ErrorType.SOCIAL_LOGIN_ONLY);
         }
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
             throw new CoreException(ErrorType.MEMBER_PASSWORD_MISMATCH);
         }
 
-        String token = tokenProvider.createToken(String.valueOf(member.getId()));
-        return new TokenResponse(token);
+        String accessToken = tokenProvider.createToken(member.getId().toString());
+        String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
+
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     @Transactional
@@ -96,9 +98,24 @@ public class AuthService {
         });
 
         String accessToken = tokenProvider.createToken(member.getId().toString());
-        return new TokenResponse(accessToken);
+        String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
+        return new TokenResponse(accessToken, refreshToken);
     }
 
+    @Transactional
+    public void logout(String accessToken) {
+        System.out.println("AccessToken 로그아웃 요청: " + accessToken);
+    }
 
+    @Transactional
+    public TokenResponse reissue(String refreshToken) {
+        if (!tokenProvider.validateToken(refreshToken)) {
+            throw new CoreException(ErrorType.INVALID_REFRESH_TOKEN);
+        }
+        String memberId = tokenProvider.getMemberId(refreshToken);
+        String newAccessToken = tokenProvider.createToken(memberId);
+
+        return new TokenResponse(newAccessToken, refreshToken);
+    }
 
 }

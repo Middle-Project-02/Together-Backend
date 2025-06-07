@@ -33,9 +33,12 @@ public class AuthController {
     @Operation(summary = "로그인", description = "사용자 로그인 처리 API")
     public ResponseEntity<ApiResponse<Void>> login(@RequestBody LoginRequest request) {
         TokenResponse response = authService.login(request);
+
         ResponseCookie accessTokenCookie = tokenCookieHandler.createAccessTokenCookie(response.accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieHandler.createRefreshTokenCookie(response.refreshToken());
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
                 .body(ApiResponse.success());
     }
 
@@ -44,9 +47,14 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenResponse>> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOAuthClient.getAccessToken(code);
         KakaoUserResponse kakaoUser = kakaoService.getKakaoUser(kakaoAccessToken);
-        TokenResponse tokenResponse = authService.kakaoLogin(kakaoUser);
+        TokenResponse token = authService.kakaoLogin(kakaoUser);
 
-        return ResponseEntity.ok(ApiResponse.success(tokenResponse));
+        ResponseCookie accessTokenCookie = tokenCookieHandler.createAccessTokenCookie(token.accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieHandler.createRefreshTokenCookie(token.refreshToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(ApiResponse.success(token));
     }
 
 
@@ -59,10 +67,26 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "사용자 로그아웃 처리 API")
-    public ResponseEntity<ApiResponse<Void>> logout() {
+    public ResponseEntity<ApiResponse<Void>> logout(@CookieValue("access_Token") String accessToken) {
+        authService.logout(accessToken);
+
         ResponseCookie expiredAccessTokenCookie = tokenCookieHandler.createExpiredAccessTokenCookie();
+        ResponseCookie expiredRefreshTokenCookie = tokenCookieHandler.createExpiredRefreshTokenCookie();
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, expiredAccessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, expiredAccessTokenCookie.toString(), expiredRefreshTokenCookie.toString())
+                .body(ApiResponse.success());
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "AccessToken 재발급", description = "Refresh Token 기반으로 Access Token 재발급 API")
+    public ResponseEntity<ApiResponse<Void>> reissue(@CookieValue("refresh_token") String refreshToken) {
+        TokenResponse newToken = authService.reissue(refreshToken);
+
+        ResponseCookie newAccessTokenCookie = tokenCookieHandler.createAccessTokenCookie(newToken.accessToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString())
                 .body(ApiResponse.success());
     }
 }

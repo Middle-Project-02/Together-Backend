@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 /**
  * JWT 토큰을 쿠키로 생성/삭제/추출하는 역할을 담당하는 컴포넌트입니다.
@@ -54,4 +55,43 @@ public class TokenCookieHandler {
                 .map(Cookie::getValue)
                 .findFirst();
     }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+
+        System.out.println("=== Debug Info ===");
+        System.out.println("properties: " + properties);
+        System.out.println("properties.refreshKey(): " + properties.refreshKey());
+        System.out.println("refreshToken parameter: " + refreshToken);
+
+        String refreshKey = properties.refreshKey();
+
+        if (refreshKey == null || refreshKey.isEmpty()) {
+            throw new IllegalArgumentException("refreshKey must not be empty");
+        }
+
+        return ResponseCookie.from(properties.refreshKey(), refreshToken)
+                .httpOnly(properties.httpOnly())
+                .secure(properties.secure())
+                .domain(properties.domain())
+                .path(properties.path())
+                .maxAge(properties.refreshMaxAge())
+                .build();
+    }
+
+    public ResponseCookie createExpiredRefreshTokenCookie() {
+        return ResponseCookie.from(properties.refreshKey(), "")
+                .httpOnly(properties.httpOnly())
+                .secure(properties.secure())
+                .domain(properties.domain())
+                .path(properties.path())
+                .maxAge(0)
+                .build();
+    }
+
+    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        return Optional.ofNullable(WebUtils.getCookie(request, properties.refreshKey()))
+                .map(Cookie::getValue);
+    }
+
+
 }
