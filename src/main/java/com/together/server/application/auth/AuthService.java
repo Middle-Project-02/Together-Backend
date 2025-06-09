@@ -3,8 +3,10 @@ package com.together.server.application.auth;
 import com.together.server.application.auth.exception.MemberNotFoundException;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
+import com.together.server.application.auth.response.KakaoUserResponse;
 import com.together.server.application.auth.response.MemberDetailsResponse;
 import com.together.server.application.auth.response.TokenResponse;
+import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.domain.member.Member;
 import com.together.server.domain.member.MemberRepository;
 import com.together.server.support.error.CoreException;
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,37 +32,73 @@ public class AuthService {
                 .findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. 사용자 식별자: %s".formatted(id)));
 
-        return new MemberDetailsResponse(member.getId(), member.getUsername(), member.getCreatedAt());
+        return new MemberDetailsResponse(member.getId(), member.getEmail(), member.getNickname(), member.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
-        Member member = getByUsername(request.username());
+        Member member = getByEmail(request.email());
+
+        if (member.getPassword() == "KAKAO_PASSWORD") {
+            throw new CoreException(ErrorType.SOCIAL_LOGIN_ONLY); // 소셜 로그인으로만 가능한 계정
+        }
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
             throw new CoreException(ErrorType.MEMBER_PASSWORD_MISMATCH);
         }
 
-        String token = tokenProvider.createToken(member.getId());
+        String token = tokenProvider.createToken(String.valueOf(member.getId()));
         return new TokenResponse(token);
     }
 
     @Transactional
-    public String register(RegisterRequest request) {
-        if (memberRepository.existsByUsername(request.username())) {
+    public MemberInfoResponse register(RegisterRequest request) {
+        if (memberRepository.existsByEmail(request.email())) {
+            throw new CoreException(ErrorType.MEMBER_USEREMAIL_ALREADY_EXISTS);
+        }
+        if (memberRepository.existsByNickname(request.nickname())) {
             throw new CoreException(ErrorType.MEMBER_USERNAME_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        Member member = new Member(request.username(), encodedPassword);
+        Member member = new Member(request.email(), request.nickname(), encodedPassword);
         Member savedMember = memberRepository.save(member);
 
-        return savedMember.getId();
+        return new MemberInfoResponse(
+                savedMember.getId(),
+                savedMember.getEmail(),
+                savedMember.getNickname(),
+                savedMember.getCreatedAt()
+        );
     }
 
-    private Member getByUsername(String username) {
+    private Member getByEmail(String email) {
         return memberRepository
-                .findByUsername(username)
+                .findByEmail(email)
                 .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
     }
+
+    @Transactional
+    public TokenResponse kakaoLogin(KakaoUserResponse kakaoUser) {
+        if (kakaoUser.email() == null || kakaoUser.nickname() == null) {
+            throw new CoreException(ErrorType.KAKAO_USERINFO_INCOMPLETE);
+        }
+
+        Optional<Member> optionalMember = memberRepository.findByEmail(kakaoUser.email());
+
+        Member member = optionalMember.orElseGet(() -> {
+            Member newMember = new Member(
+                    kakaoUser.email(),
+                    kakaoUser.nickname(),
+                    "KAKAO_PASSWORD"
+            );
+            return memberRepository.save(newMember);
+        });
+
+        String accessToken = tokenProvider.createToken(member.getId().toString());
+        return new TokenResponse(accessToken);
+    }
+
+
+
 }

@@ -8,19 +8,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Member extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "member_email", nullable = false, unique = true)
+    private String email;
 
-    @Column(nullable = false)
+    @Column(name = "member_password", nullable = false)
     private String password;
 
-    public Member(String username, String password) {
-        this.username = username;
+    @Column(name = "member_nickname", nullable = false)
+    private String nickname;
+
+    public Member(String email, String nickname, String password) {
+        this.email = email;
+        this.nickname = nickname;
         this.password = password;
     }
 }
