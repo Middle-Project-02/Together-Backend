@@ -1,0 +1,23 @@
+COMMIT_MSG_FILE="$1"
+BRANCH_NAME="$(git rev-parse --abbrev-ref HEAD)"
+
+ISSUE_TAG=$(echo "$BRANCH_NAME" | grep -oE '#[0-9]+')
+
+if [ -z "$ISSUE_TAG" ]; then
+  npx --no-install commitlint --edit "$COMMIT_MSG_FILE"
+  exit $?
+fi
+
+COMMIT_HEADER=$(head -n 1 "$COMMIT_MSG_FILE")
+
+if [[ "$COMMIT_HEADER" != *"$ISSUE_TAG"* ]]; then
+  COMMIT_BODY=$(tail -n +2 "$COMMIT_MSG_FILE")
+
+  {
+    printf "%s %s\n" "$COMMIT_HEADER" "$ISSUE_TAG"
+    printf "%s" "$COMMIT_BODY"
+  } > "$COMMIT_MSG_FILE"
+fi
+
+npx --no-install commitlint --edit "$COMMIT_MSG_FILE"
+exit $?
