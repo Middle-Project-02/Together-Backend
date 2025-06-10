@@ -9,6 +9,8 @@ public record TokenCookieProperties(
         boolean secure,
         String domain,
         String path,
-        long maxAge
+        long maxAge,
+        String refreshKey,
+        long refreshMaxAge
 ) {
 }
