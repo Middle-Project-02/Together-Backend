@@ -67,7 +67,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "사용자 로그아웃 처리 API")
-    public ResponseEntity<ApiResponse<Void>> logout(@CookieValue("access_Token") String accessToken) {
+    public ResponseEntity<ApiResponse<Void>> logout(@CookieValue("access_token") String accessToken) {
         authService.logout(accessToken);
 
         ResponseCookie expiredAccessTokenCookie = tokenCookieHandler.createExpiredAccessTokenCookie();
