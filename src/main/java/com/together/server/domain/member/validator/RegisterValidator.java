@@ -25,14 +25,11 @@ public class RegisterValidator {
         }
 
         if (!request.memberId().matches("^01[016789]\\d{7,8}$")) {
-            throw new CoreException(ErrorType.PHONE_NUMBER_INVALID);
+            throw new CoreException(ErrorType.INVALID_PHONE_NUMBER_FORMAT);
         }
 
         if (memberRepository.existsByMemberId(request.memberId())) {
-            throw new CoreException(ErrorType.MEMBER_USEREMAIL_ALREADY_EXISTS);
-        }
-        if (memberRepository.existsByNickname(request.nickname())) {
-            throw new CoreException(ErrorType.MEMBER_USERNAME_ALREADY_EXISTS);
+            throw new CoreException(ErrorType.MEMBER_PHONE_NUMBER_ALREADY_EXISTS);
         }
 
 

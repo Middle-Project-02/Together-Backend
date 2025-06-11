@@ -8,6 +8,7 @@ import com.together.server.infra.security.jwt.exception.BlankTokenException;
 import com.together.server.infra.security.jwt.exception.InvalidTokenException;
 import com.together.server.infra.security.jwt.exception.TokenExpiredException;
 import com.together.server.infra.web.TokenCookieHandler;
+import com.together.server.support.error.ErrorType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,11 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             return tokenProvider.getMemberId(token);
         } catch (BlankTokenException e) {
-            throw new BadCredentialsException("토큰이 비어 있습니다.", e);
+            throw new BadCredentialsException(ErrorType.TOKEN_NOT_IN_COOKIE.name(), e);
         } catch (TokenExpiredException e) {
-            throw new CredentialsExpiredException("토큰이 만료되었습니다.", e);
+            throw new CredentialsExpiredException(ErrorType.ACCESS_TOKEN_EXPIRED.name(), e);
         } catch (InvalidTokenException e) {
-            throw new BadCredentialsException("토큰이 유효하지 않습니다.", e);
+            throw new BadCredentialsException(ErrorType.ACCESS_TOKEN_INVALID.name(), e);
         }
     }
 
@@ -72,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             return authService.getMemberDetails(memberId);
         } catch (MemberNotFoundException e) {
-            throw new BadCredentialsException("토큰에 해당하는 사용자를 찾을 수 없습니다.", e);
+            throw new BadCredentialsException(ErrorType.MEMBER_NOT_FOUND.name(), e);
         }
     }
 }

@@ -32,13 +32,16 @@ public class AuthService {
     public MemberDetailsResponse getMemberDetails(String id) {
         Member member = memberRepository
                 .findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. 사용자 식별자: %s".formatted(id)));
+                .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
 
         return new MemberDetailsResponse(member.getId(), member.getMemberId(), member.getNickname(), member.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
+        if (!memberRepository.existsByMemberId(request.memberId())) {
+            throw new CoreException(ErrorType.INVALID_PHONE_OR_PASSWORD);
+        }
         Member member = getByMemberId(request.memberId());
 
         if (member.getPassword().equals("KAKAO_PASSWORD")) {
@@ -46,7 +49,7 @@ public class AuthService {
         }
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
-            throw new CoreException(ErrorType.MEMBER_PASSWORD_MISMATCH);
+            throw new CoreException(ErrorType.INVALID_PHONE_OR_PASSWORD);
         }
 
         String accessToken = tokenProvider.createToken(member.getId().toString());
@@ -107,7 +110,7 @@ public class AuthService {
     @Transactional
     public TokenResponse reissue(String refreshToken) {
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new CoreException(ErrorType.INVALID_REFRESH_TOKEN);
+            throw new CoreException(ErrorType.REFRESH_TOKEN_INVALID);
         }
         String memberId = tokenProvider.getMemberId(refreshToken);
         String newAccessToken = tokenProvider.createToken(memberId);
