@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record MemberInfoResponse(
         Long id,
-        String email,
+        String memberId,
         String nickname,
         Instant createdAt
 ) {

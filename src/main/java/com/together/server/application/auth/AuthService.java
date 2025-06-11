@@ -11,6 +11,7 @@ import com.together.server.domain.member.Member;
 import com.together.server.domain.member.MemberRepository;
 import com.together.server.support.error.CoreException;
 import com.together.server.support.error.ErrorType;
+import com.together.server.domain.member.validator.RegisterValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final RegisterValidator registerValidator;
 
     @Transactional(readOnly = true)
     public MemberDetailsResponse getMemberDetails(String id) {
@@ -32,12 +34,12 @@ public class AuthService {
                 .findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다. 사용자 식별자: %s".formatted(id)));
 
-        return new MemberDetailsResponse(member.getId(), member.getEmail(), member.getNickname(), member.getCreatedAt());
+        return new MemberDetailsResponse(member.getId(), member.getMemberId(), member.getNickname(), member.getCreatedAt());
     }
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
-        Member member = getByEmail(request.email());
+        Member member = getByMemberId(request.memberId());
 
         if (member.getPassword().equals("KAKAO_PASSWORD")) {
             throw new CoreException(ErrorType.SOCIAL_LOGIN_ONLY);
@@ -55,28 +57,23 @@ public class AuthService {
 
     @Transactional
     public MemberInfoResponse register(RegisterRequest request) {
-        if (memberRepository.existsByEmail(request.email())) {
-            throw new CoreException(ErrorType.MEMBER_USEREMAIL_ALREADY_EXISTS);
-        }
-        if (memberRepository.existsByNickname(request.nickname())) {
-            throw new CoreException(ErrorType.MEMBER_USERNAME_ALREADY_EXISTS);
-        }
+        registerValidator.validate(request);
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        Member member = new Member(request.email(), request.nickname(), encodedPassword);
+        Member member = new Member(request.memberId(), request.nickname(), encodedPassword);
         Member savedMember = memberRepository.save(member);
 
         return new MemberInfoResponse(
                 savedMember.getId(),
-                savedMember.getEmail(),
+                savedMember.getMemberId(),
                 savedMember.getNickname(),
                 savedMember.getCreatedAt()
         );
     }
 
-    private Member getByEmail(String email) {
+    private Member getByMemberId(String memberId) {
         return memberRepository
-                .findByEmail(email)
+                .findByMemberId(memberId)
                 .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
     }
 
@@ -86,7 +83,7 @@ public class AuthService {
             throw new CoreException(ErrorType.KAKAO_USERINFO_INCOMPLETE);
         }
 
-        Optional<Member> optionalMember = memberRepository.findByEmail(kakaoUser.email());
+        Optional<Member> optionalMember = memberRepository.findByMemberId(kakaoUser.email());
 
         Member member = optionalMember.orElseGet(() -> {
             Member newMember = new Member(
