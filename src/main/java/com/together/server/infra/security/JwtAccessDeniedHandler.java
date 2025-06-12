@@ -29,7 +29,8 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpStatus.FORBIDDEN.value());
 
-        ApiResponse<Void> errorResponse = ApiResponse.error(ErrorType.FORBIDDEN);
+        ErrorType errorType = ErrorType.FORBIDDEN;
+        ApiResponse<Void> errorResponse = ApiResponse.error(errorType.getCode(), errorType.getMessage());
         String body = objectMapper.writeValueAsString(errorResponse);
 
         response.getWriter().write(body);

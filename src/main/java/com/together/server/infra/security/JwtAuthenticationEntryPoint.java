@@ -42,7 +42,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             return;
         }
 
-        handleUnauthorizedError(response);
+        ErrorType errorType = extractErrorTypeFromException(exception);
+        handleUnauthorizedError(response, errorType);
     }
 
     private boolean shouldAttemptTokenRefresh(AuthenticationException exception, HttpServletRequest request) {
@@ -62,19 +63,19 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             response.setHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } catch (TokenExpiredException | InvalidTokenException e) {
-            handleExpiredTokens(response);
+            handleExpiredTokens(response, ErrorType.REFRESH_TOKEN_EXPIRED);
         }
     }
 
-    private void handleExpiredTokens(HttpServletResponse response) throws IOException {
+    private void handleExpiredTokens(HttpServletResponse response, ErrorType errorType) throws IOException {
         clearAuthenticationCookies(response);
-        writeErrorResponse(response);
+        writeErrorResponse(response, errorType);
     }
 
-    private void handleUnauthorizedError(HttpServletResponse response) throws IOException {
+    private void handleUnauthorizedError(HttpServletResponse response, ErrorType errorType) throws IOException {
         ResponseCookie expiredAccessTokenCookie = tokenCookieHandler.createExpiredAccessTokenCookie();
         response.setHeader(HttpHeaders.SET_COOKIE, expiredAccessTokenCookie.toString());
-        writeErrorResponse(response);
+        writeErrorResponse(response, errorType);
     }
 
     private void clearAuthenticationCookies(HttpServletResponse response) {
@@ -85,13 +86,21 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.addHeader(HttpHeaders.SET_COOKIE, expiredRefreshTokenCookie.toString());
     }
 
-    private void writeErrorResponse(HttpServletResponse response) throws IOException {
+    private void writeErrorResponse(HttpServletResponse response, ErrorType errorType) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(errorType.getStatus().value());
 
-        ApiResponse<Void> errorResponse = ApiResponse.error(ErrorType.UNAUTHORIZED);
+        ApiResponse<Void> errorResponse = ApiResponse.error(errorType.getCode(), errorType.getMessage());
         String responseBody = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(responseBody);
+    }
+
+    private ErrorType extractErrorTypeFromException(AuthenticationException exception) {
+        try {
+            return ErrorType.valueOf(exception.getMessage());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ErrorType.UNAUTHORIZED;
+        }
     }
 }

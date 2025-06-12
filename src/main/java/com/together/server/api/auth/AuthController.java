@@ -46,7 +46,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(ApiResponse.success());
+                .body(ApiResponse.success(null));
     }
 
     @PatchMapping("/firstLogin")
@@ -78,7 +78,7 @@ public class AuthController {
     @Operation(summary = "회원가입", description = "사용자 회원가입 처리 API")
     public ResponseEntity<ApiResponse<MemberInfoResponse>> register(@RequestBody RegisterRequest request) {
         MemberInfoResponse response = authService.register(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/logout")
@@ -91,7 +91,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, expiredAccessTokenCookie.toString(), expiredRefreshTokenCookie.toString())
-                .body(ApiResponse.success());
+                .body(ApiResponse.success(null));
     }
 
     @PostMapping("/reissue")
@@ -103,6 +103,6 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString())
-                .body(ApiResponse.success());
+                .body(ApiResponse.success(null));
     }
 }

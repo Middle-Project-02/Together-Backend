@@ -8,33 +8,21 @@ import lombok.Getter;
 @Getter
 public class ApiResponse<T> {
 
-    private final ResultType result;
+    private final int code;
+    private final T content;
+    private final String message;
 
-    private final T data;
-    private final ErrorMessage error;
-    private final Instant timestamp;
-
-    public static ApiResponse<Void> success() {
-        return new ApiResponse<>(ResultType.SUCCESS, null, null);
+    public ApiResponse(int code, T content, String message) {
+        this.code = code;
+        this.content = content;
+        this.message = message;
     }
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(ResultType.SUCCESS, data, null);
+    public static <T> ApiResponse<T> success(T content) {
+        return new ApiResponse<>(20000, content, null);
     }
 
-    public static ApiResponse<Void> error(ErrorType error) {
-        return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error));
-    }
-
-    
-    public static ApiResponse<Void> error(ErrorType error, Object errorData) {
-        return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error, errorData));
-    }
-
-    private ApiResponse(ResultType result, T data, ErrorMessage error) {
-        this.result = result;
-        this.data = data;
-        this.error = error;
-        this.timestamp = Instant.now();
+    public static <T> ApiResponse<T> error(int code, String message) {
+        return new ApiResponse<>(code, null, message);
     }
 }

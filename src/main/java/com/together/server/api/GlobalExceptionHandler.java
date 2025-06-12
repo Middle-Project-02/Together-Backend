@@ -22,10 +22,9 @@ public class GlobalExceptionHandler {
             case WARN -> log.warn("CoreException : {}", e.getMessage(), e);
             default -> log.info("CoreException : {}", e.getMessage(), e);
         }
-
-        ApiResponse<Void> response = ApiResponse.error(e.getErrorType(), e.getData());
-        HttpStatus status = e.getErrorType().getStatus();
-        return new ResponseEntity<>(response, status);
+        ErrorType errorType = e.getErrorType();
+        ApiResponse<Void> response = ApiResponse.error(errorType.getCode(), errorType.getMessage());
+        return new ResponseEntity<>(response, errorType.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
@@ -33,8 +32,7 @@ public class GlobalExceptionHandler {
         log.error("Exception : {}", e.getMessage(), e);
 
         ErrorType errorType = ErrorType.INTERNAL_SERVER_ERROR;
-        ApiResponse<Void> response = ApiResponse.error(errorType);
-        HttpStatus status = errorType.getStatus();
-        return new ResponseEntity<>(response, status);
+        ApiResponse<Void> response = ApiResponse.error(errorType.getCode(), errorType.getMessage());
+        return new ResponseEntity<>(response, errorType.getStatus());
     }
 }
