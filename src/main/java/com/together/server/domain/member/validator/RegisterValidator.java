@@ -35,6 +35,5 @@ public class RegisterValidator {
             throw new CoreException(ErrorType.MEMBER_USERNAME_ALREADY_EXISTS);
         }
 
-
     }
 }
