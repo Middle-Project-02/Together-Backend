@@ -40,22 +40,27 @@ public class TemplateService {
     }
 
     @Transactional(readOnly = true)
-    public TemplateDetailResponse getTemplateDetail(Long id) {
-        Template t = templateRepository.findById(id)
+    public TemplateDetailResponse getTemplateDetail(Long templateId, Long memberId) {
+        Template t = templateRepository.findById(templateId)
                 .orElseThrow(() -> new CoreException(ErrorType.TEMPLATE_NOT_FOUND));
+
+        if (!t.getMemberId().equals(memberId)) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
         return new TemplateDetailResponse(t.getId(), t.getTitle(), t.getContent(), t.getChatId(), t.getPlanId());
     }
 
     @Transactional
     public void deleteTemplate(Long templateId, Long memberId) {
-        Template template = templateRepository.findById(templateId)
+        Template t = templateRepository.findById(templateId)
                 .orElseThrow(() -> new CoreException(ErrorType.TEMPLATE_NOT_FOUND));
 
-        if (!template.getMemberId().equals(memberId)) {
+        if (!t.getMemberId().equals(memberId)) {
             throw new CoreException(ErrorType.FORBIDDEN);
         }
 
-        templateRepository.delete(template);
+        templateRepository.delete(t);
     }
 
 }

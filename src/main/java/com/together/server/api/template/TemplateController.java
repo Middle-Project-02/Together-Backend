@@ -38,23 +38,29 @@ public class TemplateController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/detail/{templateId}")
     @Operation(summary = "템플릿 상세 조회", description = "템플릿 ID로 해당 템플릿 상세 정보 조회")
-    public ResponseEntity<ApiResponse<TemplateDetailResponse>> detailTemplate(@PathVariable Long id) {
-        TemplateDetailResponse response = templateService.getTemplateDetail(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "템플릿 삭제", description = "템플릿 ID로 해당 템플릿 삭제")
-    public ResponseEntity<ApiResponse<Void>> deleteTemplate(@PathVariable Long id, @AuthenticationPrincipal Accessor accessor) {
+    public ResponseEntity<ApiResponse<TemplateDetailResponse>> detailTemplate(@PathVariable Long templateId, @AuthenticationPrincipal Accessor accessor) {
 
         if (accessor.isGuest()) {
             throw new CoreException(ErrorType.FORBIDDEN);
         }
 
         Long memberId = Long.valueOf(accessor.id());
-        templateService.deleteTemplate(id, memberId);
+        TemplateDetailResponse response = templateService.getTemplateDetail(templateId, memberId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @DeleteMapping("/{templateId}")
+    @Operation(summary = "템플릿 삭제", description = "템플릿 ID로 해당 템플릿 삭제")
+    public ResponseEntity<ApiResponse<Void>> deleteTemplate(@PathVariable Long templateId, @AuthenticationPrincipal Accessor accessor) {
+
+        if (accessor.isGuest()) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
+        Long memberId = Long.valueOf(accessor.id());
+        templateService.deleteTemplate(templateId, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
