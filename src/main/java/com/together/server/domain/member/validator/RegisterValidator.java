@@ -32,6 +32,5 @@ public class RegisterValidator {
             throw new CoreException(ErrorType.MEMBER_PHONE_NUMBER_ALREADY_EXISTS);
         }
 
-
     }
 }

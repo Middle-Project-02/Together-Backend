@@ -1,6 +1,7 @@
 package com.together.server.application.auth;
 
 import com.together.server.application.auth.exception.MemberNotFoundException;
+import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
 import com.together.server.application.auth.response.KakaoUserResponse;
@@ -9,6 +10,7 @@ import com.together.server.application.auth.response.TokenResponse;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.domain.member.Member;
 import com.together.server.domain.member.MemberRepository;
+import com.together.server.domain.member.validator.FirstLoginValidator;
 import com.together.server.support.error.CoreException;
 import com.together.server.support.error.ErrorType;
 import com.together.server.domain.member.validator.RegisterValidator;
@@ -27,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RegisterValidator registerValidator;
+    private final FirstLoginValidator firstLoginValidator;
 
     @Transactional(readOnly = true)
     public MemberDetailsResponse getMemberDetails(String id) {
@@ -116,6 +119,23 @@ public class AuthService {
         String newAccessToken = tokenProvider.createToken(memberId);
 
         return new TokenResponse(newAccessToken, refreshToken);
+    }
+
+    @Transactional
+    public void updateFirstLoginInfo(String memberId, FirstLoginRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
+
+        if (!member.getIsFirstLogin()) {
+            throw new CoreException(ErrorType.ALREADY_UPDATED_FIRST_INFO);
+        }
+        firstLoginValidator.validate(request);
+
+        member.updateFirstLoginInfo(
+                request.ageGroup(),
+                request.preferredPrice(),
+                request.fontMode()
+        );
     }
 
 }
