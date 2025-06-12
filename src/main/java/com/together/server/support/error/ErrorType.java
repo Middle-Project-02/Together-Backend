@@ -38,8 +38,7 @@ public enum ErrorType {
     ALREADY_UPDATED_FIRST_INFO(40124, HttpStatus.BAD_REQUEST, "이미 추가 항목이 설정된 사용자입니다.", LogLevel.WARN),
     REQUIRED_AGE_GROUP(40121, HttpStatus.BAD_REQUEST, "연령대는 필수 항목입니다.", LogLevel.WARN),
     REQUIRED_PREFERRED_PRICE(40122, HttpStatus.BAD_REQUEST, "선호 요금제는 필수 항목입니다.", LogLevel.WARN),
-    REQUIRED_FONT_MODE(40123, HttpStatus.BAD_REQUEST, "글씨 크기 선택은 필수 항목입니다.", LogLevel.WARN);
-
+    REQUIRED_FONT_MODE(40123, HttpStatus.BAD_REQUEST, "글씨 크기 선택은 필수 항목입니다.", LogLevel.WARN),
 
     // 템플릿
     TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN);
