@@ -28,7 +28,6 @@ spring:
             scope:
               - ${KAKAO_SCOPE_NICKNAME}
               - ${KAKAO_SCOPE_EMAIL}
-
   jpa:
     open-in-view: false
     show-sql: true
@@ -38,27 +37,28 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 security:
   user:
     name: ${USER_NAME}
     password: ${USER_PASSWORD}
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expirationTime: 86400000 # 1 day
+  refreshTokenTime: 604800000 # 7 days
 
-  jwt:
-    secret-key: ${JWT_SECRET_KEY}
-    expirationTime: 86400000 # 1 day
-    refreshTokenTime: 604800000 # 7 days
-  cookie:
-    token:
-      key: access_token
-      refresh-key: refresh_token
-      http-only: true
-      secure: true
-      domain: localhost
-      path: /
-      max-age: 86400 # 1 day
-      refresh-max-age: 604800 # 7 days
+cookie:
+  token:
+    key: access_token
+    refresh-key: refresh_token
+    http-only: true
+    secure: true
+    domain: localhost
+    path: /
+    max-age: 86400 # 1 day
+    refresh-max-age: 604800 # 7 days
 
 openai:
   api:
