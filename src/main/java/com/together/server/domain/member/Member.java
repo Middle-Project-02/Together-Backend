@@ -35,11 +35,15 @@ public class Member extends BaseEntity {
     @Column(name = "is_first_login", nullable = false)
     private Boolean isFirstLogin = true;
 
+    @Column(name = "delflag", nullable = false)
+    private Boolean delflag = false;
+
     public Member(String memberId, String nickname, String password) {
         this.memberId = memberId;
         this.nickname = nickname;
         this.password = password;
         this.isFirstLogin = true;
+        this.delflag = false;
     }
 
     public void updateFirstLoginInfo(String ageGroup, String preferredPrice, Boolean fontMode) {
@@ -48,4 +52,25 @@ public class Member extends BaseEntity {
         this.fontMode = String.valueOf(fontMode);
         this.isFirstLogin = false;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updatePreferredPrice(String preferredPrice) {
+        this.preferredPrice = preferredPrice;
+    }
+
+    public void updateFontMode(String fontMode) {
+        this.fontMode = fontMode;
+    }
+
+    public boolean isDeleted() {
+        return delflag;
+    }
+
+    public void delete() {
+        this.delflag = true;
+    }
+
 }

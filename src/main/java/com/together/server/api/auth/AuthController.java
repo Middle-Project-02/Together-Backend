@@ -56,7 +56,6 @@ public class AuthController {
         String memberId = accessor.id();
         authService.updateFirstLoginInfo(memberId, request);
         return ResponseEntity.ok(ApiResponse.success(null));
-
     }
 
     @GetMapping("/login/kakao")
