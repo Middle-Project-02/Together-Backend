@@ -31,8 +31,9 @@ spring:
   jpa:
     open-in-view: false
     show-sql: true
-    hibernate:
-      ddl-auto: update
+    hibernate.hbm2ddl.auto: update
+    # hibernate:
+    #  ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -44,21 +45,21 @@ security:
     name: ${USER_NAME}
     password: ${USER_PASSWORD}
 
-jwt:
-  secret-key: ${JWT_SECRET_KEY}
-  expirationTime: 86400000 # 1 day
-  refreshTokenTime: 604800000 # 7 days
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expirationTime: 86400000 # 1 day
+    refreshTokenTime: 604800000 # 7 days
 
-cookie:
-  token:
-    key: access_token
-    refresh-key: refresh_token
-    http-only: true
-    secure: true
-    domain: localhost
-    path: /
-    max-age: 86400 # 1 day
-    refresh-max-age: 604800 # 7 days
+  cookie:
+    token:
+      key: access_token
+      refresh-key: refresh_token
+      http-only: true
+      secure: true
+      domain: localhost
+      path: /
+      max-age: 86400 # 1 day
+      refresh-max-age: 604800 # 7 days
 
 openai:
   api:
