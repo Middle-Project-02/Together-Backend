@@ -1,9 +1,9 @@
 package com.together.server.application.auth;
 
-import com.together.server.application.auth.exception.MemberNotFoundException;
 import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
+import com.together.server.application.member.request.UpdateMemberInfoRequest;
 import com.together.server.application.auth.response.KakaoUserResponse;
 import com.together.server.application.auth.response.MemberDetailsResponse;
 import com.together.server.application.auth.response.TokenResponse;
@@ -42,10 +42,15 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequest request) {
+        Member member = getByMemberId(request.memberId());
+
         if (!memberRepository.existsByMemberId(request.memberId())) {
             throw new CoreException(ErrorType.INVALID_PHONE_OR_PASSWORD);
         }
-        Member member = getByMemberId(request.memberId());
+
+        if (member.isDeleted()) {
+            throw new CoreException(ErrorType.MEMBER_WITHDRAWN);
+        }
 
         if (member.getPassword().equals("KAKAO_PASSWORD")) {
             throw new CoreException(ErrorType.SOCIAL_LOGIN_ONLY);
@@ -99,6 +104,10 @@ public class AuthService {
             );
             return memberRepository.save(newMember);
         });
+
+        if (member.isDeleted()) {
+            throw new CoreException(ErrorType.MEMBER_WITHDRAWN);
+        }
 
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());

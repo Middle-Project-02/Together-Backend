@@ -33,12 +33,13 @@ public enum ErrorType {
     INVALID_PHONE_NUMBER_FORMAT(40105,HttpStatus.BAD_REQUEST, "전화번호 형식이 올바르지 않습니다.", LogLevel.WARN),
     REQUIRED_MEMBER_ID(40103,HttpStatus.BAD_REQUEST, "전화번호는 필수 항목입니다.", LogLevel.WARN),
     REQUIRED_NICKNAME(40102, HttpStatus.BAD_REQUEST, "닉네임은 필수 항목입니다.", LogLevel.WARN),
-    REQUIRED_PASSWORD(40104, HttpStatus.BAD_REQUEST, "비밀번호는 필수 항목입니다.", LogLevel.WARN);
+    REQUIRED_PASSWORD(40104, HttpStatus.BAD_REQUEST, "비밀번호는 필수 항목입니다.", LogLevel.WARN),
     
     ALREADY_UPDATED_FIRST_INFO(40124, HttpStatus.BAD_REQUEST, "이미 추가 항목이 설정된 사용자입니다.", LogLevel.WARN),
     REQUIRED_AGE_GROUP(40121, HttpStatus.BAD_REQUEST, "연령대는 필수 항목입니다.", LogLevel.WARN),
     REQUIRED_PREFERRED_PRICE(40122, HttpStatus.BAD_REQUEST, "선호 요금제는 필수 항목입니다.", LogLevel.WARN),
-    REQUIRED_FONT_MODE(40123, HttpStatus.BAD_REQUEST, "글씨 크기 선택은 필수 항목입니다.", LogLevel.WARN);
+    REQUIRED_FONT_MODE(40123, HttpStatus.BAD_REQUEST, "글씨 크기 선택은 필수 항목입니다.", LogLevel.WARN),
+    MEMBER_WITHDRAWN(40125, HttpStatus.BAD_REQUEST, "이미 탈퇴한 사용자입니다.", LogLevel.WARN);
 
   
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;
