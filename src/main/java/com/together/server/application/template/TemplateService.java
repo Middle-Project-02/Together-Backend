@@ -21,9 +21,9 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
 
     @Transactional
-    public void saveTemplate(TemplateSaveRequest request) {
+    public void saveTemplate(TemplateSaveRequest request, Long memberId) {
         Template template = new Template(
-                request.memberId(),
+                memberId,
                 request.chatId(),
                 request.title(),
                 request.content(),
@@ -62,5 +62,4 @@ public class TemplateService {
 
         templateRepository.delete(t);
     }
-
 }

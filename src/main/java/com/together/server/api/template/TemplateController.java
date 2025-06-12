@@ -26,14 +26,27 @@ public class TemplateController {
 
     @PostMapping
     @Operation(summary = "템플릿 저장", description = "추천 요금제 정보를 템플릿으로 저장")
-    public ResponseEntity<ApiResponse<Void>> saveTemplate(@RequestBody TemplateSaveRequest request) {
-        templateService.saveTemplate(request);
+    public ResponseEntity<ApiResponse<Void>> saveTemplate(@RequestBody TemplateSaveRequest request,
+    @AuthenticationPrincipal Accessor accessor) {
+
+        if (accessor.isGuest()) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
+        Long memberId = Long.valueOf(accessor.id());
+        templateService.saveTemplate(request, memberId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @GetMapping("/{memberId}")
+    @GetMapping
     @Operation(summary = "템플릿 목록 조회", description = "사용자의 템플릿 목록 조회")
-    public ResponseEntity<ApiResponse<List<TemplateSimpleResponse>>> listTemplates(@PathVariable Long memberId) {
+    public ResponseEntity<ApiResponse<List<TemplateSimpleResponse>>> listTemplates(@AuthenticationPrincipal Accessor accessor) {
+
+        if (accessor.isGuest()) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
+        Long memberId = Long.valueOf(accessor.id());
         List<TemplateSimpleResponse> response = templateService.getTemplates(memberId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -61,7 +74,6 @@ public class TemplateController {
 
         Long memberId = Long.valueOf(accessor.id());
         templateService.deleteTemplate(templateId, memberId);
-
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
