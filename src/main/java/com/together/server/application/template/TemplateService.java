@@ -47,9 +47,14 @@ public class TemplateService {
     }
 
     @Transactional
-    public void deleteTemplate(Long id) {
-        Template template = templateRepository.findById(id)
+    public void deleteTemplate(Long templateId, Long memberId) {
+        Template template = templateRepository.findById(templateId)
                 .orElseThrow(() -> new CoreException(ErrorType.TEMPLATE_NOT_FOUND));
+
+        if (!template.getMemberId().equals(memberId)) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
         templateRepository.delete(template);
     }
 

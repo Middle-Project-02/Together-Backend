@@ -10,7 +10,7 @@ public enum ErrorType {
     // 공통
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내 예상치 못한 오류가 발생했습니다.", LogLevel.ERROR),
     UNAUTHORIZED(40001, HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.", LogLevel.WARN),
-    FORBIDDEN(40002, HttpStatus.FORBIDDEN, "접근 권한이 없습니다.", LogLevel.WARN),
+    FORBIDDEN(40003, HttpStatus.FORBIDDEN, "접근 권한이 없습니다.", LogLevel.WARN),
 
     // 회원
     MEMBER_NOT_FOUND(40114, HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.", LogLevel.WARN),

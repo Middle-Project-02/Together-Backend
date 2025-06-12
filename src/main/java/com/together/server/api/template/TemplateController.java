@@ -5,10 +5,14 @@ import com.together.server.application.template.TemplateService;
 import com.together.server.application.template.request.TemplateSaveRequest;
 import com.together.server.application.template.response.TemplateDetailResponse;
 import com.together.server.application.template.response.TemplateSimpleResponse;
+import com.together.server.infra.security.Accessor;
+import com.together.server.support.error.CoreException;
+import com.together.server.support.error.ErrorType;
 import com.together.server.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,8 +47,15 @@ public class TemplateController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "템플릿 삭제", description = "템플릿 ID로 해당 템플릿 삭제")
-    public ResponseEntity<ApiResponse<Void>> deleteTemplate(@PathVariable Long id) {
-        templateService.deleteTemplate(id);
+    public ResponseEntity<ApiResponse<Void>> deleteTemplate(@PathVariable Long id, @AuthenticationPrincipal Accessor accessor) {
+
+        if (accessor.isGuest()) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
+
+        Long memberId = Long.valueOf(accessor.id());
+        templateService.deleteTemplate(id, memberId);
+
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
