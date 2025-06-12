@@ -2,12 +2,14 @@ package com.together.server.api.auth;
 
 import com.together.server.application.auth.AuthService;
 import com.together.server.application.auth.KakaoService;
+import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
 import com.together.server.application.auth.response.KakaoUserResponse;
 import com.together.server.application.auth.response.TokenResponse;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.infra.oauth.KakaoOAuthClient;
+import com.together.server.infra.security.Accessor;
 import com.together.server.infra.web.TokenCookieHandler;
 import com.together.server.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,9 +41,21 @@ public class AuthController {
         ResponseCookie accessTokenCookie = tokenCookieHandler.createAccessTokenCookie(response.accessToken());
         ResponseCookie refreshTokenCookie = tokenCookieHandler.createRefreshTokenCookie(response.refreshToken());
 
+        System.out.println("accessToken: " + response.accessToken());
+        System.out.println("refreshToken: " + response.refreshToken());
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
                 .body(ApiResponse.success());
+    }
+
+    @PatchMapping("/firstLogin")
+    @Operation(summary = "최초 로그인 추가 정보 입력", description = "최초 로그인 시 추가 정보 등록")
+    public ResponseEntity<ApiResponse<Void>> updateFirstLoginInfo(@RequestBody FirstLoginRequest request) {
+        Accessor accessor = (Accessor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String memberId = accessor.id();
+        authService.updateFirstLoginInfo(memberId, request);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/login/kakao")

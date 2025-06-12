@@ -57,12 +57,6 @@ public class TokenCookieHandler {
     }
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-
-        System.out.println("=== Debug Info ===");
-        System.out.println("properties: " + properties);
-        System.out.println("properties.refreshKey(): " + properties.refreshKey());
-        System.out.println("refreshToken parameter: " + refreshToken);
-
         String refreshKey = properties.refreshKey();
 
         if (refreshKey == null || refreshKey.isEmpty()) {
