@@ -5,6 +5,7 @@ import com.together.server.application.notification.response.NotificationDetailR
 import com.together.server.application.notification.response.NotificationSimpleResponse;
 import com.together.server.domain.notification.Notification;
 import com.together.server.domain.notification.NotificationRepository;
+import com.together.server.domain.notification.validator.NotificationCreateValidator;
 import com.together.server.support.error.CoreException;
 import com.together.server.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationCreateValidator notificationCreateValidator;
 
     @Transactional
     public void createNotification(NotificationCreateRequest request) {
+        notificationCreateValidator.validate(request);
         Notification notification = new Notification(request.title(), request.content());
         notificationRepository.save(notification);
     }

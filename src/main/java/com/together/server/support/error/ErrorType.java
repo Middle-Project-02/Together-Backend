@@ -44,7 +44,9 @@ public enum ErrorType {
     TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN),
 
     // 알림장
-    NOTIFICATION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당 알림장이 없습니다.", LogLevel.WARN);
+    NOTIFICATION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당 알림장이 없습니다.", LogLevel.WARN),
+    INVALID_NOTIFICATION_TITLE(40402, HttpStatus.BAD_REQUEST, "알림장 제목은 비어 있을 수 없습니다.", LogLevel.WARN),
+    INVALID_NOTIFICATION_CONTENT(40403, HttpStatus.BAD_REQUEST, "알림장 내용은 비어 있을 수 없습니다.", LogLevel.WARN);
 
 
 
