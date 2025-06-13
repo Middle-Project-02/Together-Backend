@@ -52,4 +52,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/api/templates/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi notificationApi() {
+        return GroupedOpenApi.builder()
+                .group("notification")
+                .pathsToMatch("/api/notifications/**")
+                .build();
+    }
 }
