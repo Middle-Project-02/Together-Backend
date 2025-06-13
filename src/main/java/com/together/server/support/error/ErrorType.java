@@ -41,8 +41,10 @@ public enum ErrorType {
     REQUIRED_FONT_MODE(40123, HttpStatus.BAD_REQUEST, "글씨 크기 선택은 필수 항목입니다.", LogLevel.WARN),
 
     // 템플릿
-    TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN);
+    TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN),
 
+    // FAQ
+    QUESTION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당하는 질문이 없습니다.", LogLevel.WARN);
 
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;
     private final int code;
