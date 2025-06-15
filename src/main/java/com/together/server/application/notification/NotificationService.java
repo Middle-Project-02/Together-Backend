@@ -32,7 +32,7 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationSimpleResponse> getAllNotifications() {
         return notificationRepository.findAll().stream()
-                .map(n -> new NotificationSimpleResponse(n.getId(), n.getTitle(), n.getIssue(), n.getTags(), n.getCreatedAt()))
+                .map(NotificationSimpleResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -41,6 +41,6 @@ public class NotificationService {
         Notification n = notificationRepository.findById(id)
                 .orElseThrow(() -> new CoreException(ErrorType.NOTIFICATION_NOT_FOUND));
 
-        return new NotificationDetailResponse(n.getId(), n.getTitle(), n.getIssue(), n.getSolution(), n.getTags(), n.getCreatedAt());
+        return NotificationDetailResponse.from(n);
     }
 }
