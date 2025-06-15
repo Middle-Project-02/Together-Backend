@@ -25,14 +25,14 @@ public class NotificationService {
     @Transactional
     public void createNotification(NotificationCreateRequest request) {
         notificationCreateValidator.validate(request);
-        Notification notification = new Notification(request.title(), request.content());
+        Notification notification = new Notification(request.title(), request.issue(), request.solution(), request.tags());
         notificationRepository.save(notification);
     }
 
     @Transactional(readOnly = true)
     public List<NotificationSimpleResponse> getAllNotifications() {
         return notificationRepository.findAll().stream()
-                .map(n -> new NotificationSimpleResponse(n.getId(), n.getTitle(), n.getCreatedAt()))
+                .map(n -> new NotificationSimpleResponse(n.getId(), n.getTitle(), n.getIssue(), n.getTags(), n.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 
@@ -41,6 +41,6 @@ public class NotificationService {
         Notification n = notificationRepository.findById(id)
                 .orElseThrow(() -> new CoreException(ErrorType.NOTIFICATION_NOT_FOUND));
 
-        return new NotificationDetailResponse(n.getId(), n.getTitle(), n.getContent(), n.getCreatedAt());
+        return new NotificationDetailResponse(n.getId(), n.getTitle(), n.getIssue(), n.getSolution(), n.getTags(), n.getCreatedAt());
     }
 }

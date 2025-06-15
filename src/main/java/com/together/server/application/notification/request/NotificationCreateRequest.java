@@ -1,4 +1,6 @@
 package com.together.server.application.notification.request;
 
-public record NotificationCreateRequest(String title, String content) {
+import java.util.List;
+
+public record NotificationCreateRequest(String title, String issue, String solution, List<String> tags) {
 }
