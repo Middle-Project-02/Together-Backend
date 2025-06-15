@@ -53,4 +53,10 @@ public class SwaggerConfig {
                 .build();
     }
 
+    public GroupedOpenApi templateApi() {
+        return GroupedOpenApi.builder()
+                .group("template")
+                .pathsToMatch("/api/templates/**")
+                .build();
+    }
 }
