@@ -1,8 +1,6 @@
 package com.together.server.domain.faq;
 
-import com.together.server.infra.persistence.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +8,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FAQChip extends BaseEntity {
+@Table(name = "faq_chip")
+public class FAQChip {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chip_id", nullable = false)
+    private Long chipId;
 
     @Column(name = "question", nullable = false, length = 255)
     private String question;

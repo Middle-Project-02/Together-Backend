@@ -22,7 +22,7 @@ public class FAQChipService {
     @Transactional(readOnly = true)
     public List<FAQChipResponse> getChips() {
         return faqChipRepository.findAll().stream()
-                .map(f -> new FAQChipResponse(f.getId(), f.getQuestion()))
+                .map(f -> new FAQChipResponse(f.getChipId(), f.getQuestion()))
                 .collect(Collectors.toList());
     }
 
