@@ -17,7 +17,7 @@ public class Quiz {
     private String message;
 
     @Column(nullable = false)
-    private boolean correctAnswer; // true = 스미싱 문자
+    private boolean correctAnswer;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String explanationIfCorrect;
@@ -25,7 +25,6 @@ public class Quiz {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String explanationIfWrong;
 
-    // 생성자
     public Quiz(String message, boolean correctAnswer, String explanationIfCorrect, String explanationIfWrong) {
         this.message = message;
         this.correctAnswer = correctAnswer;

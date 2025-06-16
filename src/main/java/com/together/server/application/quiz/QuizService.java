@@ -9,7 +9,6 @@ import com.together.server.domain.quiz.QuizRepository;
 import com.together.server.support.error.CoreException;
 import com.together.server.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class QuizService {
 
     public Quiz getRandomQuiz() {
         List<Quiz> all = quizRepository.findAll();
-        if (all.isEmpty()) throw new RuntimeException("퀴즈가 없습니다.");
+        if (all.isEmpty()) throw new CoreException(ErrorType.QUIZ_EMPTY);
         return all.get(new Random().nextInt(all.size()));
     }
 
@@ -35,7 +34,7 @@ public class QuizService {
                 .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
 
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("퀴즈 없음"));
+                .orElseThrow(() -> new CoreException(ErrorType.QUIZ_NOT_FOUND));
 
         boolean isCorrect = (quiz.isCorrectAnswer() == userAnswer);
         String feedback = isCorrect ? quiz.getExplanationIfCorrect() : quiz.getExplanationIfWrong();
@@ -44,7 +43,7 @@ public class QuizService {
                 .orElseGet(() -> scoreRepository.save(new MemberScore(member)));
 
         if (isCorrect) {
-            score.increaseScore(1); // 정답일 경우 점수 증가
+            score.increaseScore(1);
             scoreRepository.save(score);
         }
 
