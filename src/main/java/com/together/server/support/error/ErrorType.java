@@ -46,7 +46,7 @@ public enum ErrorType {
     // 알림장
     NOTIFICATION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당 알림장이 없습니다.", LogLevel.WARN),
     INVALID_NOTIFICATION_TITLE(40402, HttpStatus.BAD_REQUEST, "알림장 제목은 비어 있을 수 없습니다.", LogLevel.WARN),
-    INVALID_NOTIFICATION_ISSUE_OR_SOLUTION(40403, HttpStatus.BAD_REQUEST, "알림장 이슈와 대응 방안은 비어 있을 수 없습니다.", LogLevel.WARN),;
+    INVALID_NOTIFICATION_ISSUE_OR_SOLUTION(40403, HttpStatus.BAD_REQUEST, "알림장 이슈와 대응 방안은 비어 있을 수 없습니다.", LogLevel.WARN);
 
 
 
