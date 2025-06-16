@@ -47,7 +47,7 @@ public class MemberController {
         MemberInfoResponse response = memberService.getMemberInfo(accessor.id());
         memberService.deleteMember(memberId);
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
 
