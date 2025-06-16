@@ -60,7 +60,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/api/auth/login/kakao/**",
                                 "/api/ranking-plans/**"
-                        ).permitAll()
+                ).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(it -> it
                         .authenticationEntryPoint(authenticationEntryPoint)

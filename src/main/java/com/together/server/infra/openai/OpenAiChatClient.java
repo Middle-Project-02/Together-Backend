@@ -36,12 +36,21 @@ public class OpenAiChatClient {
      *
      * @param prompt 사용자 입력 프롬프트
      * @return Flux<String> 형태의 GPT 응답 스트림
+     *
+     * temperature: 0.7: 너무 낮으면 기계적, 너무 높으면 일관성 떨어짐
+     * top_p: 0.9: 토큰 선택의 다양성 증가
+     * frequency_penalty, presence_penalty: 반복 줄이고 다양한 표현 유도
      */
     public Flux<String> streamChatCompletion(String prompt) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
         body.put("messages", List.of(Map.of("role", "user", "content", prompt)));
         body.put("stream", true);
+
+        body.put("temperature", 0.7);
+        body.put("top_p", 0.9);
+        body.put("frequency_penalty", 0.1);
+        body.put("presence_penalty", 0.1);
 
         return openaiWebClient.post()
                 .bodyValue(body)
