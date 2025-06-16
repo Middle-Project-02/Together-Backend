@@ -42,7 +42,13 @@ public enum ErrorType {
     MEMBER_WITHDRAWN(40125, HttpStatus.BAD_REQUEST, "이미 탈퇴한 사용자입니다.", LogLevel.WARN);
 
     // 템플릿
-    TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN);
+    TEMPLATE_NOT_FOUND(40301, HttpStatus.NOT_FOUND, "저장된 템플릿이 없습니다.", LogLevel.WARN),
+
+    // 알림장
+    NOTIFICATION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당 알림장이 없습니다.", LogLevel.WARN),
+    INVALID_NOTIFICATION_TITLE(40402, HttpStatus.BAD_REQUEST, "알림장 제목은 비어 있을 수 없습니다.", LogLevel.WARN),
+    INVALID_NOTIFICATION_ISSUE_OR_SOLUTION(40403, HttpStatus.BAD_REQUEST, "알림장 이슈와 대응 방안은 비어 있을 수 없습니다.", LogLevel.WARN);
+
 
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;
     private final int code;
