@@ -59,7 +59,7 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/api/auth/login/kakao/**"
-                        ).permitAll()
+                ).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(it -> it
                         .authenticationEntryPoint(authenticationEntryPoint)
