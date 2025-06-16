@@ -1,7 +1,8 @@
 package com.together.server.application.plan;
 
+import com.together.server.application.plan.response.RankingPlanDetailResponse;
 import com.together.server.application.plan.response.RankingPlanListResponse;
-import com.together.server.application.plan.response.RankingPlanResponse;
+import com.together.server.application.plan.response.RankingPlanSimpleResponse;
 import com.together.server.domain.member.Member;
 import com.together.server.domain.member.MemberRepository;
 import com.together.server.domain.plan.RankingPlan;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * 요금제 랭킹 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
  * @see RankingPlan
- * @see RankingPlanResponse
+ * @see RankingPlanSimpleResponse
  */
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,6 @@ public class RankingPlanService {
         if (!isGuest) {
             Member member = memberRepository.findByMemberId(accessor.id())
                     .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
-
             userAgeGroup = member.getAgeGroup();
         }
 
@@ -60,8 +60,8 @@ public class RankingPlanService {
 
 
         List<RankingPlan> plans = rankingPlanRepository.findByAgeGroupOrderByRank(targetAgeGroup);
-        List<RankingPlanResponse> responseList = plans.stream()
-                .map(RankingPlanResponse::new)
+        List<RankingPlanSimpleResponse> responseList = plans.stream()
+                .map(RankingPlanSimpleResponse::new)
                 .collect(Collectors.toList());
 
         return new RankingPlanListResponse(
@@ -70,5 +70,12 @@ public class RankingPlanService {
                 userAgeGroup,
                 responseList
         );
+
+    }
+
+    public RankingPlanDetailResponse getPlanDetail(Integer id) {
+        RankingPlan plan = rankingPlanRepository.findById(id)
+                .orElseThrow(() -> new CoreException(ErrorType.PLAN_NOT_FOUND));
+        return new RankingPlanDetailResponse(plan);
     }
 }

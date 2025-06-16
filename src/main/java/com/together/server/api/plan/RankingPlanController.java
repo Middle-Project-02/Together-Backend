@@ -2,6 +2,7 @@
 package com.together.server.api.plan;
 
 import com.together.server.application.plan.RankingPlanService;
+import com.together.server.application.plan.response.RankingPlanDetailResponse;
 import com.together.server.application.plan.response.RankingPlanListResponse;
 import com.together.server.infra.security.Accessor;
 import com.together.server.support.response.ApiResponse;
@@ -48,5 +49,9 @@ public class RankingPlanController {
         RankingPlanListResponse response = rankingPlanService.getRankingPlans(accessor, ageGroup);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-
+    @GetMapping("/{id}")
+    @Operation(summary = "요금제 상세 정보 조회", description = "해당 요금제의 상세 혜택 정보 (allBenefits)를 반환합니다.")
+    public ResponseEntity<ApiResponse<RankingPlanDetailResponse>> getPlanDetail(@PathVariable Integer id) {
+        return ResponseEntity.ok(ApiResponse.success(rankingPlanService.getPlanDetail(id)));
+    }
 }
