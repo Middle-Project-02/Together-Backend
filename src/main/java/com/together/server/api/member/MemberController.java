@@ -27,7 +27,7 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PatchMapping("/infoUpdate")
+    @PatchMapping("/me")
     @Operation(summary = "회원 정보 수정", description = "사용자 닉네임, 요금제, 글씨 크기 수정")
     public ResponseEntity<ApiResponse<UpdateMemberInfoResponse>> updateMemberInfo(
             @RequestBody UpdateMemberInfoRequest request
@@ -39,7 +39,7 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/me")
     @Operation(summary = "회원 탈퇴", description = "사용자 탈퇴")
     public ResponseEntity<ApiResponse<MemberInfoResponse>> deleteMember() {
         Accessor accessor = (Accessor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
