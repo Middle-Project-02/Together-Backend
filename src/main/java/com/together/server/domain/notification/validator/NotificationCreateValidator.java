@@ -13,8 +13,8 @@ public class NotificationCreateValidator {
             throw new CoreException(ErrorType.INVALID_NOTIFICATION_TITLE);
         }
 
-        if (request.issue() == null || request.issue().trim().isEmpty() || request.solution() == null || request.solution().trim().isEmpty()) {
-            throw new CoreException(ErrorType.INVALID_NOTIFICATION_ISSUE_OR_SOLUTION);
+        if (request.summary() == null || request.issue() == null || request.impact() == null || request.solution() == null) {
+            throw new CoreException(ErrorType.INVALID_NOTIFICATION_CONTENT);
         }
     }
 }
