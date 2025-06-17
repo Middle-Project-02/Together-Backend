@@ -10,21 +10,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class ChatSession {
     private final String userId;
-//    private final String roomId;
     private final SseEmitter emitter;
     private final Queue<ChatMessage> messages;
     private final Map<String, String> userCondition;
 
     public ChatSession(String userId, SseEmitter emitter) {
         this.userId = userId;
-//        this.roomId = roomId;
         this.emitter = emitter;
         this.messages = new LinkedList<>();
         this.userCondition = new ConcurrentHashMap<>();
     }
 
     public void addMessage(ChatMessage message) {
-        //로그 추가
         System.out.println("[채팅 메시지 저장] " + message.getSender() + ": " + message.getContent());
         messages.add(message);
     }

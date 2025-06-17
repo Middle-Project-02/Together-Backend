@@ -38,23 +38,19 @@ public class SmartChoiceClient {
                             .queryParam("sms", sms)
                             .queryParam("age", age)
                             .queryParam("type", type)
-//                            .queryParam("dis", "Y")
                             .queryParam("authkey", authKey)
                             .build())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
 
-            // 응답 로깅
             log.info("SmartChoice API 응답: {}", xmlResponse);
 
-            // XML 검증
             if (xmlResponse == null || xmlResponse.trim().isEmpty()) {
                 log.error("SmartChoice API 응답이 비어있습니다.");
                 return List.of();
             }
 
-            // HTML 응답인지 확인
             if (xmlResponse.trim().toLowerCase().startsWith("<!doctype") ||
                     xmlResponse.trim().toLowerCase().startsWith("<html")) {
                 log.error("SmartChoice API에서 HTML 응답을 받았습니다. XML이 아닙니다: {}", xmlResponse);

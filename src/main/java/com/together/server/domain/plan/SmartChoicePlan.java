@@ -1,21 +1,3 @@
-//package com.together.server.domain.plan;
-//
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//
-//public class SmartChoicePlan {
-//    private String planName;
-//    private String data;
-//    private String voice;
-//    private String sms;
-//    private String telecom;
-//    private String price;
-//}
 package com.together.server.domain.plan;
 
 import lombok.AllArgsConstructor;
