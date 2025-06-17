@@ -1,7 +1,7 @@
 package com.together.server.api.chat;
 
 import com.together.server.application.chat.SmishingChatService;
-import com.together.server.application.chat.request.SmishingChatRequest;
+import com.together.server.application.chat.request.ChatRequest;
 import com.together.server.infra.security.Accessor;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +31,7 @@ public class SmishingChatController {
     }
 
     @PostMapping("/message")
-    public void sendMessage(@AuthenticationPrincipal Accessor accessor, @RequestBody @Valid SmishingChatRequest req) {
+    public void sendMessage(@AuthenticationPrincipal Accessor accessor, @RequestBody @Valid ChatRequest req) {
         SmishingChatService.sendMessage(accessor.id(), "user", req.content());
     }
 }
