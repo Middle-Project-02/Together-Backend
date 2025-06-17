@@ -49,6 +49,10 @@ public enum ErrorType {
     INVALID_NOTIFICATION_TITLE(40402, HttpStatus.BAD_REQUEST, "알림장 제목은 비어 있을 수 없습니다.", LogLevel.WARN),
     INVALID_NOTIFICATION_ISSUE_OR_SOLUTION(40403, HttpStatus.BAD_REQUEST, "알림장 이슈와 대응 방안은 비어 있을 수 없습니다.", LogLevel.WARN),
 
+    // 퀴즈
+    QUIZ_NOT_FOUND(40601, HttpStatus.BAD_REQUEST, "해당 퀴즈를 찾을 수 없습니다.", LogLevel.WARN),
+    QUIZ_EMPTY(40602, HttpStatus.BAD_REQUEST, "등록된 퀴즈가 없습니다.", LogLevel.WARN);
+
     // FAQ
     QUESTION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당하는 질문이 없습니다.", LogLevel.WARN);
 

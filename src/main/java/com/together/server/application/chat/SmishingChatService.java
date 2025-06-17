@@ -96,7 +96,6 @@ public class SmishingChatService {
         Disposable subscription = openAiChatClient.streamChatCompletion(promptForMessage)
                 .subscribe(
                         chunk -> {
-//                            System.out.println("OpenAI chunk received: [" + chunk + "]");
                             chunkBuffer.append(chunk);
 
                             if (chunk.endsWith(" ") || chunk.endsWith("\n")) {

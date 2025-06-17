@@ -68,4 +68,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/api/notifications/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi QuizApi() {
+        return GroupedOpenApi.builder()
+                .group("quiz")
+                .pathsToMatch("/api/quiz/**")
+                .build();
+    }
 }
