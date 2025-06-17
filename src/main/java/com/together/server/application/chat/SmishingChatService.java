@@ -33,7 +33,7 @@ public class SmishingChatService {
 
     public SseEmitter connect(String userId) {
         SseEmitter emitter = sseEmitterService.createEmitter(userId);
-        ChatSession session = new ChatSession(userId, null, emitter);
+        ChatSession session = new ChatSession(userId, emitter);
         smishingChatSessions.put(userId, session);
         return emitter;
     }
