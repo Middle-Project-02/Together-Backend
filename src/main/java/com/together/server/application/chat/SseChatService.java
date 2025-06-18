@@ -61,7 +61,6 @@ public class SseChatService {
         if (!missing.isEmpty()) {
             List<Map<String, String>> messages = new ArrayList<>();
 
-            // ⭐️ system message
             messages.add(Map.of(
                     "role", "system",
                     "content", String.join("\n",
@@ -78,14 +77,12 @@ public class SseChatService {
                     )
             ));
 
-            // 회원condition summary
             if (!session.getUserCondition().isEmpty()) {
                 StringBuilder summary = new StringBuilder("지금까지 사용자가 알려준 정보:\n");
                 session.getUserCondition().forEach((k, v) -> summary.append("- ").append(k).append(": ").append(v).append("\n"));
                 messages.add(Map.of("role", "system", "content", summary.toString()));
             }
 
-            // 대화 히스토리
             messages.addAll(
                     session.getMessages().stream()
                             .map(msg -> Map.of("role", msg.getSender(), "content", msg.getContent()))
@@ -96,7 +93,6 @@ public class SseChatService {
                 StringBuilder chunkBuffer = new StringBuilder();  // 버퍼 선언
                 Disposable subscription = openAiChatClient.streamMultiturnChatCompletion(messages)
                         .subscribe(
-//                                chunk -> sendEvent(userId, "stream_chat", chunk),
                                 chunk -> {
                                     chunkBuffer.append(chunk);
                                     if (chunk.endsWith(" ") || chunk.endsWith("\n")) {
@@ -108,9 +104,7 @@ public class SseChatService {
                                     log.error("OpenAI 스트림 응답 오류", error);
                                     sseEmitterService.removeEmitter(userId);
                                 },
-//                                () -> sendEvent(userId, "done", "done")
                                 () -> {
-                                    // 남은 버퍼가 있으면 마지막으로 전송
                                     if (chunkBuffer.length() > 0) {
                                         sendEvent(userId, "stream_chat", chunkBuffer.toString());
                                     }
@@ -125,7 +119,6 @@ public class SseChatService {
         } else {
             sendEvent(userId, "stream_chat", "답변 감사합니다! \ud83d\ude0a\n말씀해주신 정보를 바탕으로 요금제를 추천해드릴게요. 잠시만 기다려주세요.");
 //            sendEvent(userId, "stream_chat", formatJson(session.getUserCondition()));
-
             try {
                 List<Map<String, String>> planList = smartChoiceClient.getPlans(
                         session.getUserCondition().get("voice"),
@@ -160,7 +153,6 @@ public class SseChatService {
     private void parseAndSetCondition(String content, ChatSession session) {
         String lowerContent = content.toLowerCase();
 
-        // 기존 key:value 처리
         String[] parts = content.split(":");
         if (parts.length == 2) {
             String key = parts[0].trim();
@@ -172,7 +164,6 @@ public class SseChatService {
             }
         }
 
-        // 자연어 처리 — 통화량
         if (lowerContent.contains("통화")) {
             int voiceValue = extractMinutes(content);
             if (voiceValue > 0) {
@@ -181,7 +172,6 @@ public class SseChatService {
             }
         }
 
-        // 데이터량
         if (lowerContent.contains("데이터") || lowerContent.contains("인터넷")) {
             int dataValue = extractData(content);
             if (dataValue > 0) {
@@ -190,7 +180,6 @@ public class SseChatService {
             }
         }
 
-        // 문자량
         if (lowerContent.contains("문자")) {
             int smsValue = extractCount(content);
             if (smsValue > 0) {
@@ -199,7 +188,6 @@ public class SseChatService {
             }
         }
 
-        // 연령대
         if (lowerContent.contains("살") || lowerContent.contains("나이")) {
             int ageValue = extractAge(content);
             if (ageValue > 0) {
