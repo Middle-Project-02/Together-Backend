@@ -19,4 +19,12 @@ public class WebClientConfig {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
+
+    @Bean(name = "smartChoiceWebClient")
+    public WebClient smartChoiceWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://api.smartchoice.or.kr/api")
+                .defaultHeader("Content-Type", "application/xml")
+                .build();
+    }
 }
