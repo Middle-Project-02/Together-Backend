@@ -11,6 +11,8 @@ import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.infra.oauth.KakaoOAuthClient;
 import com.together.server.infra.security.Accessor;
 import com.together.server.infra.web.TokenCookieHandler;
+import com.together.server.support.error.CoreException;
+import com.together.server.support.error.ErrorType;
 import com.together.server.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,8 +53,11 @@ public class AuthController {
 
     @PatchMapping("/firstLogin")
     @Operation(summary = "최초 로그인 추가 정보 입력", description = "최초 로그인 시 추가 정보 등록")
-    public ResponseEntity<ApiResponse<Void>> updateFirstLoginInfo(@RequestBody FirstLoginRequest request) {
-        Accessor accessor = (Accessor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<ApiResponse<Void>> updateFirstLoginInfo(@RequestBody FirstLoginRequest request,
+                                                                  @AuthenticationPrincipal Accessor accessor) {
+        if (accessor.isGuest()) {
+            throw new CoreException(ErrorType.FORBIDDEN);
+        }
         String memberId = accessor.id();
         authService.updateFirstLoginInfo(memberId, request);
         return ResponseEntity.ok(ApiResponse.success(null));

@@ -59,4 +59,28 @@ public class SwaggerConfig {
                 .pathsToMatch("/api/templates/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi faqChipApi() {
+        return GroupedOpenApi.builder()
+                .group("faq-chip")
+                .pathsToMatch("/api/faq-chips/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi notificationApi() {
+        return GroupedOpenApi.builder()
+                .group("notification")
+                .pathsToMatch("/api/notifications/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi QuizApi() {
+        return GroupedOpenApi.builder()
+                .group("quiz")
+                .pathsToMatch("/api/quiz/**")
+                .build();
+    }
 }
