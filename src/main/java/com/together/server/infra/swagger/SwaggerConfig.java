@@ -49,7 +49,7 @@ public class SwaggerConfig {
     public GroupedOpenApi rankingApi() {
         return GroupedOpenApi.builder()
                 .group("ranking")
-                .pathsToMatch("/api/ranking-plans/**")
+                .pathsToMatch("/api/ranking/**")
                 .build();
     }
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @see RankingPlanService
  */
 @RestController
-@RequestMapping("/api/ranking-plans")
+@RequestMapping("/api/ranking")
 @RequiredArgsConstructor
 @Tag(name = "요금제 랭킹", description = "연령대별 인기 요금제 랭킹 조회 API")
 public class RankingPlanController {
@@ -32,8 +32,8 @@ public class RankingPlanController {
      * @param ageGroup 조회할 연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)
      * @return 요금제 랭킹 목록 응답
      * @example
-     * GET /api/ranking-plans?ageGroup=2  // 20대 요금제
-     * GET /api/ranking-plans?ageGroup=1  // 전체 요금제 (기본값)
+     * GET /api/ranking?ageGroup=2  // 20대 요금제
+     * GET /api/ranking?ageGroup=1  // 전체 요금제 (기본값)
      */
     @GetMapping
     @Operation(
@@ -56,7 +56,7 @@ public class RankingPlanController {
      * @param id 요금제 ID
      * @return 요금제 상세 정보 응답
      * @example
-     * GET /api/ranking-plans/1
+     * GET /api/ranking/1
      */
     @GetMapping("/{id}")
     @Operation(
