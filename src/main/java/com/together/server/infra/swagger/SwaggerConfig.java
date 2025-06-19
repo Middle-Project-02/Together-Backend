@@ -53,6 +53,7 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
     public GroupedOpenApi templateApi() {
         return GroupedOpenApi.builder()
                 .group("template")
