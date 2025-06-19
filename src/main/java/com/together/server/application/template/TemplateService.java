@@ -1,8 +1,7 @@
 package com.together.server.application.template;
 
 import com.together.server.application.template.request.TemplateSaveRequest;
-import com.together.server.application.template.response.TemplateDetailResponse;
-import com.together.server.application.template.response.TemplateSimpleResponse;
+import com.together.server.application.template.response.TemplateResponse;
 import com.together.server.domain.template.Template;
 import com.together.server.domain.template.TemplateRepository;
 import com.together.server.support.error.CoreException;
@@ -22,25 +21,19 @@ public class TemplateService {
 
     @Transactional
     public void saveTemplate(TemplateSaveRequest request, Long memberId) {
-        Template template = new Template(
-                memberId,
-                request.chatId(),
-                request.title(),
-                request.content(),
-                request.planId()
-        );
+        Template template = new Template(memberId, request.title(), request.content());
         templateRepository.save(template);
     }
 
     @Transactional(readOnly = true)
-    public List<TemplateSimpleResponse> getTemplates(Long memberId) {
+    public List<TemplateResponse> getTemplates(Long memberId) {
         return templateRepository.findAllByMemberId(memberId).stream()
-                .map(t -> new TemplateSimpleResponse(t.getId(), t.getTitle()))
+                .map(t -> new TemplateResponse(t.getTemplateId(), t.getTitle(), t.getContent()))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public TemplateDetailResponse getTemplateDetail(Long templateId, Long memberId) {
+    public TemplateResponse getTemplateDetail(Long templateId, Long memberId) {
         Template t = templateRepository.findById(templateId)
                 .orElseThrow(() -> new CoreException(ErrorType.TEMPLATE_NOT_FOUND));
 
@@ -48,7 +41,7 @@ public class TemplateService {
             throw new CoreException(ErrorType.FORBIDDEN);
         }
 
-        return new TemplateDetailResponse(t.getId(), t.getTitle(), t.getContent(), t.getChatId(), t.getPlanId());
+        return new TemplateResponse(t.getTemplateId(), t.getTitle(), t.getContent());
     }
 
     @Transactional
@@ -61,5 +54,22 @@ public class TemplateService {
         }
 
         templateRepository.delete(t);
+    }
+
+    public TemplateSaveRequest parseTitleAndContent(String raw) {
+        String title = "템플릿 제목";
+        String content = raw;
+
+        int titleStart = raw.indexOf("제목:");
+        int contentStart = raw.indexOf("내용:");
+
+        if (titleStart != -1 && contentStart != -1 && titleStart < contentStart) {
+            String extractedTitle = raw.substring(titleStart + 3, contentStart).trim();
+            String extractedContent = raw.substring(contentStart + 3).trim();
+            if (!extractedTitle.isEmpty()) title = extractedTitle;
+            if (!extractedContent.isEmpty()) content = extractedContent;
+        }
+
+        return new TemplateSaveRequest(title, content);
     }
 }
