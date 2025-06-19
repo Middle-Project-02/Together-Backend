@@ -5,9 +5,22 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
+/**
+ * 요금제 랭킹 정보를 담는 엔티티입니다.
+ * 실제 DB 구조: ageGroup이 1,2,3,4,5,6 숫자 코드
+ *
+ * @author ihyeeun
+ */
 @Entity
 @Getter
-@Table(name = "ranking_plans")
+@Table(
+        name = "ranking_plans",
+        indexes = {
+                @Index(name = "idx_age_group_rank", columnList = "age_group, `rank`")
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RankingPlan {
 
@@ -15,14 +28,33 @@ public class RankingPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "age_group")
-    private String ageGroup;
+    /**
+     * 연령대 구분 - 실제 DB 값
+     * 1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상
+     */
+    @Column(name = "age_group", nullable = false)
+    private Integer ageGroup;
 
-    @Column(name = "rank")
+    /**
+     * 해당 연령대 내 랭킹 순위
+     */
+    @Column(name = "`rank`", nullable = false)
     private Integer rank;
 
+    @Column(nullable = false)
     private String name;
+
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "data_type")
+    private DataType dataType;
+
+    /**
+     * 데이터 용량 (GB 단위) - 문자열로 저장된 경우가 있음
+     */
+    @Column(name = "data_amount_gb")
+    private String dataAmountGb;
 
     @Column(name = "regular_price")
     private String regularPrice;
@@ -45,6 +77,23 @@ public class RankingPlan {
     @Column(name = "target_types")
     private String targetTypes;
 
-    @Column(name = "all_benefits")
+    @Column(name = "all_benefits", columnDefinition = "TEXT")
     private String allBenefits;
+
+    /**
+     * 데이터 용량을 BigDecimal로 변환합니다.
+     *
+     * @return 데이터 용량 (GB)
+     */
+    public BigDecimal getDataAmountGbAsDecimal() {
+        if (dataAmountGb == null || dataAmountGb.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return new BigDecimal(dataAmountGb);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 }

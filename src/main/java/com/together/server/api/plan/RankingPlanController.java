@@ -1,19 +1,20 @@
-// 📁 com/together/server/api/ranking_plan/RankingPlanController.java
 package com.together.server.api.plan;
 
 import com.together.server.application.plan.RankingPlanService;
 import com.together.server.application.plan.response.RankingPlanDetailResponse;
 import com.together.server.application.plan.response.RankingPlanListResponse;
-import com.together.server.infra.security.Accessor;
 import com.together.server.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 요금제 랭킹 관련 API를 제공하는 컨트롤러입니다.
+ * 사용자가 선택한 연령대 기준으로 단순화
+ *
  * @author ihyeeun
  * @see RankingPlanService
  */
@@ -28,30 +29,45 @@ public class RankingPlanController {
     /**
      * 연령대별 인기 요금제 랭킹을 조회합니다.
      *
-     * @param ageGroup 조회할 연령대 (전체, 20대, 30대, 40대, 50대, 60대이상)
+     * @param ageGroup 조회할 연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)
      * @return 요금제 랭킹 목록 응답
-     * GET /api/ranking-plans?ageGroup=20대
-     * GET /api/ranking-plans (로그인 사용자의 연령대 맞춤 추천)
+     * @example
+     * GET /api/ranking-plans?ageGroup=2  // 20대 요금제
+     * GET /api/ranking-plans?ageGroup=1  // 전체 요금제 (기본값)
      */
     @GetMapping
     @Operation(
             summary = "인기 요금제 랭킹 조회",
             description = "연령대별 인기 요금제 20개를 조회합니다.<br>" +
-                    "로그인이 되어있다면 사용자의 연령대에 해당하는 탭이 기본 선택되어 요금제가 조회되며,<br>" +
-                    "비로그인이라면 전체 탭이 기본 선택되어 보여집니다.<br>" +
-                    "[전체, 20대, 30대, 40대, 50대, 60대이상]"
+                    "사용자가 선택한 연령대 탭에 따라 해당 연령대의 인기 요금제를 반환합니다.<br>" +
+                    "연령대 코드: 1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상"
     )
-    public ResponseEntity<ApiResponse<RankingPlanListResponse>> getRankingPlans(@RequestParam(required = false) String ageGroup) {
+    public ResponseEntity<ApiResponse<RankingPlanListResponse>> getRankingPlans(
+            @Parameter(description = "연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)", example = "2")
+            @RequestParam(required = false, defaultValue = "1") Integer ageGroup) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Accessor accessor = (principal instanceof Accessor) ? (Accessor) principal : Accessor.GUEST;
-
-        RankingPlanListResponse response = rankingPlanService.getRankingPlans(accessor, ageGroup);
+        RankingPlanListResponse response = rankingPlanService.getRankingPlans(ageGroup);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    /**
+     * 특정 요금제의 상세 정보를 조회합니다.
+     *
+     * @param id 요금제 ID
+     * @return 요금제 상세 정보 응답
+     * @example
+     * GET /api/ranking-plans/1
+     */
     @GetMapping("/{id}")
-    @Operation(summary = "요금제 상세 정보 조회", description = "해당 요금제의 상세 혜택 정보 (allBenefits)를 반환합니다.")
-    public ResponseEntity<ApiResponse<RankingPlanDetailResponse>> getPlanDetail(@PathVariable Integer id) {
-        return ResponseEntity.ok(ApiResponse.success(rankingPlanService.getPlanDetail(id)));
+    @Operation(
+            summary = "요금제 상세 정보 조회",
+            description = "해당 요금제의 상세 혜택 정보 (allBenefits)를 반환합니다."
+    )
+    public ResponseEntity<ApiResponse<RankingPlanDetailResponse>> getPlanDetail(
+            @Parameter(description = "요금제 ID", example = "1")
+            @PathVariable Integer id) {
+
+        RankingPlanDetailResponse response = rankingPlanService.getPlanDetail(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -3,11 +3,8 @@ package com.together.server.application.plan;
 import com.together.server.application.plan.response.RankingPlanDetailResponse;
 import com.together.server.application.plan.response.RankingPlanListResponse;
 import com.together.server.application.plan.response.RankingPlanSimpleResponse;
-import com.together.server.domain.member.Member;
-import com.together.server.domain.member.MemberRepository;
 import com.together.server.domain.plan.RankingPlan;
 import com.together.server.domain.plan.RankingPlanRepository;
-import com.together.server.infra.security.Accessor;
 import com.together.server.support.error.CoreException;
 import com.together.server.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 요금제 랭킹 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
+ * 사용자가 선택한 연령대 기준으로 요금제 조회
+ *
+ * @author ihyeeun
  * @see RankingPlan
  * @see RankingPlanSimpleResponse
  */
@@ -30,52 +29,49 @@ import java.util.stream.Collectors;
 public class RankingPlanService {
 
     private final RankingPlanRepository rankingPlanRepository;
-    private final MemberRepository memberRepository;
 
     /**
-     * 로그인 여부에 따라 연령대 기반 요금제 랭킹을 조회합니다.
+     * 선택된 연령대의 요금제 랭킹을 조회합니다.
      *
-     * @param accessor 로그인 사용자 정보 (비로그인 시 guest 처리)
-     * @param ageGroup 선택된 연령대 탭 (null이면 사용자 연령대 사용)
+     * @param ageGroup 조회할 연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)
      * @return 요금제 랭킹 응답
      */
-    public RankingPlanListResponse getRankingPlans(Accessor accessor, String ageGroup) {
-        boolean isGuest = (accessor == null || accessor.isGuest());
-        String userAgeGroup = null;
+    public RankingPlanListResponse getRankingPlans(Integer ageGroup) {
+        // 기본값 처리: ageGroup이 null이면 전체(1) 조회
+        Integer targetAgeGroup = (ageGroup != null) ? ageGroup : 1;
 
-        if (!isGuest) {
-            Member member = memberRepository.findByMemberId(accessor.id())
-                    .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
-            userAgeGroup = member.getAgeGroup();
-        }
+        log.info("요금제 랭킹 조회 - 연령대 코드: {}", targetAgeGroup);
 
-        String targetAgeGroup;
-        if (ageGroup != null) {
-            targetAgeGroup = ageGroup;
-        } else if (userAgeGroup != null) {
-            targetAgeGroup = userAgeGroup;
-        } else {
-            targetAgeGroup = "전체";
-        }
-
-
+        // 데이터베이스에서 해당 연령대 요금제 목록 조회 (20개)
         List<RankingPlan> plans = rankingPlanRepository.findByAgeGroupOrderByRank(targetAgeGroup);
+
+        // 응답 DTO로 변환
         List<RankingPlanSimpleResponse> responseList = plans.stream()
                 .map(RankingPlanSimpleResponse::new)
-                .collect(Collectors.toList());
+                .toList();
 
+        log.info("요금제 랭킹 조회 완료 - 연령대: {}, 결과 수: {}", targetAgeGroup, responseList.size());
+
+        // 단순화된 응답 (로그인 관련 정보 제거)
         return new RankingPlanListResponse(
                 targetAgeGroup,
-                !isGuest,
-                userAgeGroup,
                 responseList
         );
-
     }
 
+    /**
+     * 요금제 상세 정보를 조회합니다.
+     *
+     * @param id 요금제 ID
+     * @return 요금제 상세 응답
+     * @throws CoreException 요금제를 찾을 수 없는 경우
+     */
     public RankingPlanDetailResponse getPlanDetail(Integer id) {
         RankingPlan plan = rankingPlanRepository.findById(id)
-                .orElseThrow(() -> new CoreException(ErrorType.PLAN_NOT_FOUND));
+                .orElseThrow(() -> new CoreException(ErrorType.INTERNAL_SERVER_ERROR)); // PLAN_NOT_FOUND 추가 후 변경
+
+        log.info("요금제 상세 조회 - ID: {}, 이름: {}", id, plan.getName());
+
         return new RankingPlanDetailResponse(plan);
     }
 }
