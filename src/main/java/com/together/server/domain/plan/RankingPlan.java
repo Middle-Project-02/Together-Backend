@@ -18,7 +18,8 @@ import java.math.BigDecimal;
 @Table(
         name = "ranking_plans",
         indexes = {
-                @Index(name = "idx_age_group_rank", columnList = "age_group, `rank`")
+                @Index(name = "idx_age_group_rank", columnList = "age_group, `rank`"),
+                @Index(name = "idx_data_amount_gb", columnList = "data_amount_gb")
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,11 +51,8 @@ public class RankingPlan {
     @Column(name = "data_type")
     private DataType dataType;
 
-    /**
-     * 데이터 용량 (GB 단위) - 문자열로 저장된 경우가 있음
-     */
     @Column(name = "data_amount_gb")
-    private String dataAmountGb;
+    private Integer dataAmountGb;
 
     @Column(name = "regular_price")
     private String regularPrice;
@@ -79,21 +77,4 @@ public class RankingPlan {
 
     @Column(name = "all_benefits", columnDefinition = "TEXT")
     private String allBenefits;
-
-    /**
-     * 데이터 용량을 BigDecimal로 변환합니다.
-     *
-     * @return 데이터 용량 (GB)
-     */
-    public BigDecimal getDataAmountGbAsDecimal() {
-        if (dataAmountGb == null || dataAmountGb.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return new BigDecimal(dataAmountGb);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 }

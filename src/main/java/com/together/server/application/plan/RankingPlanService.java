@@ -40,8 +40,6 @@ public class RankingPlanService {
         // 기본값 처리: ageGroup이 null이면 전체(1) 조회
         Integer targetAgeGroup = (ageGroup != null) ? ageGroup : 1;
 
-        log.info("요금제 랭킹 조회 - 연령대 코드: {}", targetAgeGroup);
-
         // 데이터베이스에서 해당 연령대 요금제 목록 조회 (20개)
         List<RankingPlan> plans = rankingPlanRepository.findByAgeGroupOrderByRank(targetAgeGroup);
 
@@ -50,9 +48,6 @@ public class RankingPlanService {
                 .map(RankingPlanSimpleResponse::new)
                 .toList();
 
-        log.info("요금제 랭킹 조회 완료 - 연령대: {}, 결과 수: {}", targetAgeGroup, responseList.size());
-
-        // 단순화된 응답 (로그인 관련 정보 제거)
         return new RankingPlanListResponse(
                 targetAgeGroup,
                 responseList
@@ -68,9 +63,7 @@ public class RankingPlanService {
      */
     public RankingPlanDetailResponse getPlanDetail(Integer id) {
         RankingPlan plan = rankingPlanRepository.findById(id)
-                .orElseThrow(() -> new CoreException(ErrorType.INTERNAL_SERVER_ERROR)); // PLAN_NOT_FOUND 추가 후 변경
-
-        log.info("요금제 상세 조회 - ID: {}, 이름: {}", id, plan.getName());
+                .orElseThrow(() -> new CoreException(ErrorType.PLAN_NOT_FOUND));
 
         return new RankingPlanDetailResponse(plan);
     }

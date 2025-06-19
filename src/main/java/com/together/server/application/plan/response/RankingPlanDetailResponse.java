@@ -7,7 +7,6 @@ import com.together.server.domain.plan.RankingPlan;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -26,7 +25,7 @@ public class RankingPlanDetailResponse {
     private final String description;
     private final String regularPrice;
     private final String dataAmount;
-    private final BigDecimal dataAmountGb;
+    private final Integer dataAmountGb;
     private final DataType dataType;
     private final Map<String, Object> allBenefits;
 
@@ -36,7 +35,7 @@ public class RankingPlanDetailResponse {
         this.description = plan.getDescription();
         this.regularPrice = plan.getRegularPrice();
         this.dataAmount = plan.getDataAmount();
-        this.dataAmountGb = plan.getDataAmountGbAsDecimal();
+        this.dataAmountGb = plan.getDataAmountGb();
         this.dataType = plan.getDataType();
         this.allBenefits = parseAllBenefits(plan.getAllBenefits());
     }
