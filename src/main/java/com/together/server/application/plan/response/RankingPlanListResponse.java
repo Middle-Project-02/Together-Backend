@@ -21,7 +21,7 @@ public class RankingPlanListResponse {
      *
      * @param currentAgeGroup 현재 조회한 연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)
      * @param plans 요금제 목록
-     * @example
+     * 사용 예시:
      * // 프론트엔드에서 숫자 코드 그대로 사용:
      * if (response.currentAgeGroup === 1) {
      *   // 전체 탭 처리
