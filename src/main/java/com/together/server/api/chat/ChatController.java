@@ -30,7 +30,7 @@ public class ChatController {
         sseChatService.sendMessage(accessor.id(), "user", req.content());
     }
 
-    @PostMapping("/summary")
+    @PostMapping("/template")
     public void requestSummary(@AuthenticationPrincipal Accessor accessor) {
         sseChatService.requestSummary(accessor.id());
     }

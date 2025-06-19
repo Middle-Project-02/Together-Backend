@@ -11,11 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * OpenAI GPT 모델과의 통신을 담당하는 클라이언트 컴포넌트입니다.
- * - 대화형 프롬프트 요청 및 스트리밍 응답 처리
- * - 단일 응답 처리
- */
 @Component
 public class OpenAiChatClient {
 
@@ -26,12 +21,6 @@ public class OpenAiChatClient {
         this.openaiWebClient = openaiWebClient;
     }
 
-    /**
-     * 요금제 조건 수집용 GPT 스트리밍 응답 메서드
-     *
-     * @param prompt 사용자 입력 프롬프트
-     * @return Flux<String> 형태의 GPT 응답 스트림
-     */
     public Flux<String> streamChatCompletion(String prompt) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
@@ -50,11 +39,6 @@ public class OpenAiChatClient {
                 .filter(chunk -> chunk != null && !chunk.isEmpty());
     }
 
-    /**
-     * 멀티턴 대화 지원용 스트리밍 응답
-     *
-     * @param messages GPT에 보낼 이전 대화 목록 (role, content 포함)
-     */
     public Flux<String> streamMultiturnChatCompletion(List<Map<String, String>> messages) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
@@ -73,12 +57,6 @@ public class OpenAiChatClient {
                 .filter(chunk -> chunk != null && !chunk.isEmpty());
     }
 
-    /**
-     * 대화 요약용 GPT 단일 응답 메서드
-     *
-     * @param prompt 사용자 입력 프롬프트
-     * @return 요약 문자열
-     */
     public String generateSummaryResponse(String prompt) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
@@ -89,15 +67,74 @@ public class OpenAiChatClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(this::extractFullText)
-                .block();  // 블로킹 방식
+                .block();
     }
 
-    /**
-     * OpenAI 스트리밍 응답에서 텍스트 부분만 추출합니다.
-     *
-     * @param json JSON 형식의 응답 문자열
-     * @return 추출된 텍스트 조각
-     */
+    public String extractUserConditions(String prompt) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", "gpt-3.5-turbo");
+        body.put("messages", List.of(
+                Map.of("role", "system", "content", "사용자의 문장에서 아래 항목들을 JSON 형태로 추출해줘. 없는 항목은 null로 채워줘. { \"voice\": \"\", \"data\": \"\", \"sms\": \"\", \"age\": \"\", \"type\": \"\" }"),
+                Map.of("role", "user", "content", prompt)
+        ));
+
+        return openaiWebClient.post()
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(this::extractFullText)
+                .block();
+    }
+
+    public Map<String, String> parseConditionJson(String json) {
+        Map<String, String> result = new HashMap<>();
+        try {
+            JsonNode node = objectMapper.readTree(json);
+            for (String key : List.of("voice", "data", "sms", "age", "type")) {
+                JsonNode val = node.get(key);
+                if (val != null && !val.isNull() && !val.asText().isBlank()) {
+                    String cleaned = cleanNumericValue(val.asText(), key);
+                    if (cleaned != null) {
+                        result.put(key, cleaned);
+                    }
+                }
+            }
+        } catch (Exception e) {
+             log.warn("JSON 파싱 실패", e);
+        }
+        return result;
+    }
+
+    private String cleanNumericValue(String raw, String key) {
+        if (raw == null) return null;
+
+        String lower = raw.toLowerCase();
+        if (lower.contains("무제한")) {
+            return "999999";
+        }
+
+        if (key.equals("type")) {
+            if (lower.contains("lte")) return "3";
+            if (lower.contains("5g")) return "6";
+            if (lower.contains("3g")) return "2";
+        }
+
+        if (key.equals("age")) {
+            if (lower.contains("청소년")) return "18";
+            if (lower.contains("성인")) return "20";
+            if (lower.contains("실버") || lower.contains("노인")) return "65";
+        }
+
+        String digits = raw.replaceAll("[^\\d]", "");
+
+        if (key.equals("data") && !digits.isEmpty()) {
+            int mb = Integer.parseInt(digits) * 1000;
+            return String.valueOf(mb);
+        }
+
+        return digits.isEmpty() ? null : digits;
+    }
+
     private String extractStreamText(String json) {
         try {
             if (json == null || json.isEmpty() || json.contains("[DONE]")) {
@@ -111,12 +148,6 @@ public class OpenAiChatClient {
         }
     }
 
-    /**
-     * OpenAI 응답 JSON에서 전체 메시지를 추출합니다.
-     *
-     * @param json JSON 응답 문자열
-     * @return 전체 응답 텍스트
-     */
     private String extractFullText(String json) {
         try {
             JsonNode root = objectMapper.readTree(json);
