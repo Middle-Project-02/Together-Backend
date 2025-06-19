@@ -1,8 +1,6 @@
 package com.together.server.domain.plan;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,10 +17,9 @@ public interface RankingPlanRepository extends JpaRepository<RankingPlan, Intege
      * 인덱스 활용: idx_age_group_rank
      *
      * @param ageGroup 조회할 연령대 코드 (1=전체, 2=20대, 3=30대, 4=40대, 5=50대, 6=60대이상)
-     * @return 해당 연령대의 요금제 목록
-     * @example
-     * List<RankingPlan> plans = repository.findByAgeGroupOrderByRank(2); // 20대 요금제
+     * @return 해당 연령대의 요금제 목록 20개 (최대 20개, 데이터가 20개 미만이면 전체 반환)
+     * List<RankingPlan> plans = repository.findTop20ByAgeGroupOrderByRankAsc(2); // 20대 요금제
      */
-    @Query("SELECT r FROM RankingPlan r WHERE r.ageGroup = :ageGroup ORDER BY r.rank ASC")
-    List<RankingPlan> findByAgeGroupOrderByRank(@Param("ageGroup") Integer ageGroup);
+
+    List<RankingPlan> findTop20ByAgeGroupOrderByRankAsc(Integer ageGroup);
 }

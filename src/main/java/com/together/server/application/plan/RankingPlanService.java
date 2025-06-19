@@ -41,7 +41,7 @@ public class RankingPlanService {
         Integer targetAgeGroup = (ageGroup != null) ? ageGroup : 1;
 
         // 데이터베이스에서 해당 연령대 요금제 목록 조회 (20개)
-        List<RankingPlan> plans = rankingPlanRepository.findByAgeGroupOrderByRank(targetAgeGroup);
+        List<RankingPlan> plans = rankingPlanRepository.findTop20ByAgeGroupOrderByRankAsc(targetAgeGroup);
 
         // 응답 DTO로 변환
         List<RankingPlanSimpleResponse> responseList = plans.stream()
