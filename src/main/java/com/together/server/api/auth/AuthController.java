@@ -5,10 +5,7 @@ import com.together.server.application.auth.KakaoService;
 import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
-import com.together.server.application.auth.response.KakaoUserResponse;
-import com.together.server.application.auth.response.LoginResponse;
-import com.together.server.application.auth.response.LoginViewResponse;
-import com.together.server.application.auth.response.TokenResponse;
+import com.together.server.application.auth.response.*;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.infra.oauth.KakaoOAuthClient;
 import com.together.server.infra.security.Accessor;
@@ -67,17 +64,17 @@ public class AuthController {
 
     @GetMapping("/login/kakao")
     @Operation(summary = "카카오 로그인", description = "사용자 카카오 로그인으로 JWT 토큰 발급")
-    public ResponseEntity<ApiResponse<TokenResponse>> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<LoginViewResponse>> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
         String kakaoAccessToken = kakaoOAuthClient.getAccessToken(code);
         KakaoUserResponse kakaoUser = kakaoService.getKakaoUser(kakaoAccessToken);
-        TokenResponse token = authService.kakaoLogin(kakaoUser);
+        KakaoLoginResponse kakaoLogin = authService.kakaoLogin(kakaoUser);
 
-        ResponseCookie accessTokenCookie = tokenCookieHandler.createAccessTokenCookie(token.accessToken());
-        ResponseCookie refreshTokenCookie = tokenCookieHandler.createRefreshTokenCookie(token.refreshToken());
+        ResponseCookie accessTokenCookie = tokenCookieHandler.createAccessTokenCookie(kakaoLogin.accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieHandler.createRefreshTokenCookie(kakaoLogin.refreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(ApiResponse.success(token));
+                .body(ApiResponse.success(new LoginViewResponse(kakaoLogin.isFirstLogin())));
     }
 
 
