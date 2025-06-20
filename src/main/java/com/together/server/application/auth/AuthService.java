@@ -4,7 +4,6 @@ import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
 import com.together.server.application.auth.response.LoginResponse;
-import com.together.server.application.member.request.UpdateMemberInfoRequest;
 import com.together.server.application.auth.response.KakaoUserResponse;
 import com.together.server.application.auth.response.MemberDetailsResponse;
 import com.together.server.application.auth.response.TokenResponse;
@@ -141,11 +140,7 @@ public class AuthService {
         }
         firstLoginValidator.validate(request);
 
-        member.updateFirstLoginInfo(
-                request.ageGroup(),
-                request.preferredPrice(),
-                request.fontMode()
-        );
+        member.updateFirstLoginInfo(request.fontMode());
     }
 
 }

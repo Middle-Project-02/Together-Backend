@@ -46,9 +46,7 @@ public class Member extends BaseEntity {
         this.delflag = false;
     }
 
-    public void updateFirstLoginInfo(Integer ageGroup, String preferredPrice, Boolean fontMode) {
-        this.ageGroup = ageGroup;
-        this.preferredPrice = preferredPrice;
+    public void updateFirstLoginInfo(Boolean fontMode) {
         this.fontMode = String.valueOf(fontMode);
         this.isFirstLogin = false;
     }
