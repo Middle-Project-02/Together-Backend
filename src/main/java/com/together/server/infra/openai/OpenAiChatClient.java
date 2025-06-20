@@ -11,42 +11,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * OpenAI GPT 모델과의 통신을 담당하는 클라이언트 컴포넌트입니다.
- * - 대화형 프롬프트 요청 및 스트리밍 응답 처리
- * - 단일 응답 처리
- */
 @Component
 public class OpenAiChatClient {
 
     private final WebClient openaiWebClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * 생성자 - OpenAI와 통신할 WebClient를 주입받습니다.
-     *
-     * @param openaiWebClient "openaiWebClient"로 지정된 WebClient Bean
-     */
     public OpenAiChatClient(@Qualifier("openaiWebClient") WebClient openaiWebClient) {
         this.openaiWebClient = openaiWebClient;
     }
 
-    /**
-     * OpenAI GPT 모델에 메시지를 보내고 스트리밍 방식으로 응답을 수신합니다.
-     *
-     * @param prompt 사용자 입력 프롬프트
-     * @return Flux<String> 형태의 GPT 응답 스트림
-     *
-     * temperature: 0.7: 너무 낮으면 기계적, 너무 높으면 일관성 떨어짐
-     * top_p: 0.9: 토큰 선택의 다양성 증가
-     * frequency_penalty, presence_penalty: 반복 줄이고 다양한 표현 유도
-     */
     public Flux<String> streamChatCompletion(String prompt) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
         body.put("messages", List.of(Map.of("role", "user", "content", prompt)));
         body.put("stream", true);
-
         body.put("temperature", 0.7);
         body.put("top_p", 0.9);
         body.put("frequency_penalty", 0.1);
@@ -60,12 +39,102 @@ public class OpenAiChatClient {
                 .filter(chunk -> chunk != null && !chunk.isEmpty());
     }
 
-    /**
-     * OpenAI 스트리밍 응답에서 텍스트 부분만 추출합니다.
-     *
-     * @param json JSON 형식의 응답 문자열
-     * @return 추출된 텍스트 조각, 없으면 빈 문자열
-     */
+    public Flux<String> streamMultiturnChatCompletion(List<Map<String, String>> messages) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", "gpt-3.5-turbo");
+        body.put("messages", messages);
+        body.put("stream", true);
+        body.put("temperature", 0.7);
+        body.put("top_p", 0.9);
+        body.put("frequency_penalty", 0.1);
+        body.put("presence_penalty", 0.1);
+
+        return openaiWebClient.post()
+                .bodyValue(body)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .map(this::extractStreamText)
+                .filter(chunk -> chunk != null && !chunk.isEmpty());
+    }
+
+    public String generateSummaryResponse(String prompt) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", "gpt-3.5-turbo");
+        body.put("messages", List.of(Map.of("role", "user", "content", prompt)));
+
+        return openaiWebClient.post()
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(this::extractFullText)
+                .block();
+    }
+
+    public String extractUserConditions(String prompt) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", "gpt-3.5-turbo");
+        body.put("messages", List.of(
+                Map.of("role", "system", "content", "사용자의 문장에서 아래 항목들을 JSON 형태로 추출해줘. 없는 항목은 null로 채워줘. { \"voice\": \"\", \"data\": \"\", \"sms\": \"\", \"age\": \"\", \"type\": \"\" }"),
+                Map.of("role", "user", "content", prompt)
+        ));
+
+        return openaiWebClient.post()
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(this::extractFullText)
+                .block();
+    }
+
+    public Map<String, String> parseConditionJson(String json) {
+        Map<String, String> result = new HashMap<>();
+        try {
+            JsonNode node = objectMapper.readTree(json);
+            for (String key : List.of("voice", "data", "sms", "age", "type")) {
+                JsonNode val = node.get(key);
+                if (val != null && !val.isNull() && !val.asText().isBlank()) {
+                    String cleaned = cleanNumericValue(val.asText(), key);
+                    if (cleaned != null) {
+                        result.put(key, cleaned);
+                    }
+                }
+            }
+        } catch (Exception e) {
+             //log.warn("JSON 파싱 실패", e);
+        }
+        return result;
+    }
+
+    private String cleanNumericValue(String raw, String key) {
+        if (raw == null) return null;
+
+        String lower = raw.toLowerCase();
+        if (lower.contains("무제한")) {
+            return "999999";
+        }
+
+        if (key.equals("type")) {
+            if (lower.contains("lte")) return "3";
+            if (lower.contains("5g")) return "6";
+            if (lower.contains("3g")) return "2";
+        }
+
+        if (key.equals("age")) {
+            if (lower.contains("청소년")) return "18";
+            if (lower.contains("성인")) return "20";
+            if (lower.contains("실버") || lower.contains("노인")) return "65";
+        }
+
+        String digits = raw.replaceAll("[^\\d]", "");
+
+        if (key.equals("data") && !digits.isEmpty()) {
+            int mb = Integer.parseInt(digits) * 1000;
+            return String.valueOf(mb);
+        }
+
+        return digits.isEmpty() ? null : digits;
+    }
+
     private String extractStreamText(String json) {
         try {
             if (json == null || json.isEmpty() || json.contains("[DONE]")) {
@@ -79,31 +148,6 @@ public class OpenAiChatClient {
         }
     }
 
-    /**
-     * OpenAI GPT 모델에 메시지를 보내고 단일 응답을 받습니다.
-     *
-     * @param prompt 사용자 입력 프롬프트
-     * @return 단일 응답 문자열 (전체 메시지)
-     */
-    public String getChatCompletion(String prompt) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("model", "gpt-3.5-turbo");
-        body.put("messages", List.of(Map.of("role", "user", "content", prompt)));
-
-        return openaiWebClient.post()
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(String.class)
-                .map(this::extractFullText)
-                .block();  // 동기 블로킹 방식
-    }
-
-    /**
-     * OpenAI 응답 JSON에서 전체 메시지를 추출합니다.
-     *
-     * @param json JSON 형식의 응답 문자열
-     * @return 추출된 응답 텍스트, 실패 시 에러 메시지
-     */
     private String extractFullText(String json) {
         try {
             JsonNode root = objectMapper.readTree(json);

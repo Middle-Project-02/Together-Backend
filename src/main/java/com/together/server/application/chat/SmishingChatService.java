@@ -33,7 +33,7 @@ public class SmishingChatService {
 
     public SseEmitter connect(String userId) {
         SseEmitter emitter = sseEmitterService.createEmitter(userId);
-        ChatSession session = new ChatSession(userId, null, emitter);
+        ChatSession session = new ChatSession(userId, emitter);
         smishingChatSessions.put(userId, session);
         return emitter;
     }
@@ -96,7 +96,6 @@ public class SmishingChatService {
         Disposable subscription = openAiChatClient.streamChatCompletion(promptForMessage)
                 .subscribe(
                         chunk -> {
-//                            System.out.println("OpenAI chunk received: [" + chunk + "]");
                             chunkBuffer.append(chunk);
 
                             if (chunk.endsWith(" ") || chunk.endsWith("\n")) {

@@ -1,26 +1,38 @@
 package com.together.server.domain.chat;
 
+import com.together.server.domain.plan.SmartChoicePlan;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.Queue;
 import java.util.LinkedList;
-import lombok.Getter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class ChatSession {
     private final String userId;
-    private final String roomId;
     private final SseEmitter emitter;
     private final Queue<ChatMessage> messages;
+    private final Map<String, String> userCondition;
 
-    public ChatSession(String userId, String roomId, SseEmitter emitter) {
+    @Setter
+    private SmartChoicePlan recommendedPlan;
+
+    public ChatSession(String userId, SseEmitter emitter) {
         this.userId = userId;
-        this.roomId = roomId;
         this.emitter = emitter;
         this.messages = new LinkedList<>();
+        this.userCondition = new ConcurrentHashMap<>();
+    }
+
+    public void addMessage(ChatMessage message) {
+        System.out.println("[채팅 메시지 저장] " + message.getSender() + ": " + message.getContent());
+        messages.add(message);
     }
 
 
-    public void addMessage(ChatMessage message) {
-        messages.add(message);
+    public void setCondition(String key, String value) {
+        userCondition.put(key, value);
     }
 }

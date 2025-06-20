@@ -24,7 +24,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(name = "age_group")
-    private String ageGroup;
+    private Integer ageGroup;
 
     @Column(name = "preferred_price")
     private String preferredPrice;
@@ -46,7 +46,7 @@ public class Member extends BaseEntity {
         this.delflag = false;
     }
 
-    public void updateFirstLoginInfo(String ageGroup, String preferredPrice, Boolean fontMode) {
+    public void updateFirstLoginInfo(Integer ageGroup, String preferredPrice, Boolean fontMode) {
         this.ageGroup = ageGroup;
         this.preferredPrice = preferredPrice;
         this.fontMode = String.valueOf(fontMode);

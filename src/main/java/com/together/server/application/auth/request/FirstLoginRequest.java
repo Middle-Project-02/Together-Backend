@@ -1,7 +1,7 @@
 package com.together.server.application.auth.request;
 
 public record FirstLoginRequest(
-    String ageGroup,
+    Integer ageGroup,
     String preferredPrice,
     Boolean fontMode
 ){}

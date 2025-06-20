@@ -46,6 +46,14 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi rankingApi() {
+        return GroupedOpenApi.builder()
+                .group("ranking")
+                .pathsToMatch("/api/ranking/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi templateApi() {
         return GroupedOpenApi.builder()
                 .group("template")
@@ -66,6 +74,14 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("notification")
                 .pathsToMatch("/api/notifications/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi QuizApi() {
+        return GroupedOpenApi.builder()
+                .group("quiz")
+                .pathsToMatch("/api/quiz/**")
                 .build();
     }
 }
