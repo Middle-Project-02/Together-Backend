@@ -3,6 +3,7 @@ package com.together.server.application.auth;
 import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
+import com.together.server.application.auth.response.LoginResponse;
 import com.together.server.application.member.request.UpdateMemberInfoRequest;
 import com.together.server.application.auth.response.KakaoUserResponse;
 import com.together.server.application.auth.response.MemberDetailsResponse;
@@ -41,7 +42,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         Member member = getByMemberId(request.memberId());
 
         if (!memberRepository.existsByMemberId(request.memberId())) {
@@ -63,7 +64,7 @@ public class AuthService {
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
 
-        return new TokenResponse(accessToken, refreshToken);
+        return new LoginResponse(accessToken, refreshToken, member.getIsFirstLogin());
     }
 
     @Transactional
