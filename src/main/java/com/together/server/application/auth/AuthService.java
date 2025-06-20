@@ -72,10 +72,9 @@ public class AuthService {
         Member savedMember = memberRepository.save(member);
 
         return new MemberInfoResponse(
-                savedMember.getId(),
                 savedMember.getMemberId(),
                 savedMember.getNickname(),
-                savedMember.getCreatedAt()
+                Boolean.TRUE.equals(savedMember.getFontMode())
         );
     }
 

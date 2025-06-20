@@ -23,10 +23,9 @@ public class MemberService {
                 .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
 
         return new MemberInfoResponse(
-                member.getId(),
                 member.getMemberId(),
                 member.getNickname(),
-                member.getCreatedAt()
+                Boolean.TRUE.equals(member.getFontMode())
         );
     }
 
@@ -39,10 +38,6 @@ public class MemberService {
             member.updateNickname(request.nickname());
         }
 
-        if (request.preferredPrice() != null) {
-            member.updatePreferredPrice(request.preferredPrice());
-        }
-
         if (request.fontMode() != null) {
             member.updateFontMode(request.fontMode());
         }
@@ -50,9 +45,7 @@ public class MemberService {
         return new UpdateMemberInfoResponse(
                 member.getMemberId(),
                 member.getNickname(),
-                member.getPreferredPrice(),
-                member.getFontMode(),
-                member.getUpdatedAt()
+                member.getFontMode()
         );
     }
 
