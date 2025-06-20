@@ -8,19 +8,69 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Member extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "member_id", nullable = false, unique = true)
+    private String memberId;
 
-    @Column(nullable = false)
+    @Column(name = "member_password", nullable = false)
     private String password;
 
-    public Member(String username, String password) {
-        this.username = username;
+    @Column(name = "member_nickname", nullable = false)
+    private String nickname;
+
+    @Column(name = "age_group")
+    private Integer ageGroup;
+
+    @Column(name = "preferred_price")
+    private String preferredPrice;
+
+    @Column(name = "font_mode")
+    private String fontMode;
+
+    @Column(name = "is_first_login", nullable = false)
+    private Boolean isFirstLogin = true;
+
+    @Column(name = "delflag", nullable = false)
+    private Boolean delflag = false;
+
+    public Member(String memberId, String nickname, String password) {
+        this.memberId = memberId;
+        this.nickname = nickname;
         this.password = password;
+        this.isFirstLogin = true;
+        this.delflag = false;
     }
+
+    public void updateFirstLoginInfo(Integer ageGroup, String preferredPrice, Boolean fontMode) {
+        this.ageGroup = ageGroup;
+        this.preferredPrice = preferredPrice;
+        this.fontMode = String.valueOf(fontMode);
+        this.isFirstLogin = false;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updatePreferredPrice(String preferredPrice) {
+        this.preferredPrice = preferredPrice;
+    }
+
+    public void updateFontMode(String fontMode) {
+        this.fontMode = fontMode;
+    }
+
+    public boolean isDeleted() {
+        return delflag;
+    }
+
+    public void delete() {
+        this.delflag = true;
+    }
+
 }

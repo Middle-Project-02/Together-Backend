@@ -1,7 +1,8 @@
 package com.together.server.application.auth.request;
 
 public record RegisterRequest(
-        String username,
+        String memberId,
+        String nickname,
         String password
 ) {
 }

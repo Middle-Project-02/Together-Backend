@@ -20,7 +20,7 @@ public abstract class BaseEntity {
     @Id
     @Tsid
     @Column(nullable = false)
-    private String id;
+    private Long id;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -29,6 +29,7 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(nullable = false)
     private Instant updatedAt;
+
 
     @Override
     public boolean equals(Object o) {
