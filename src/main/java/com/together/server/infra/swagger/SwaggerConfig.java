@@ -46,6 +46,14 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi rankingApi() {
+        return GroupedOpenApi.builder()
+                .group("ranking")
+                .pathsToMatch("/api/ranking/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi templateApi() {
         return GroupedOpenApi.builder()
                 .group("template")

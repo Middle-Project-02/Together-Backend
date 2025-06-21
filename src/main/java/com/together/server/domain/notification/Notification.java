@@ -1,26 +1,36 @@
 package com.together.server.domain.notification;
 
-import com.together.server.infra.persistence.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends BaseEntity {
+public class Notification {
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(name = "issue", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String summary;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String issue;
 
-    @Column(name = "solution", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String impact;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String solution;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -28,9 +38,15 @@ public class Notification extends BaseEntity {
     @Column(name = "tags")
     private List<String> tags = new ArrayList<>();
 
-    public Notification(String title, String issue, String solution, List<String> tags) {
+
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
+
+    public Notification(String title, String summary, String issue, String impact, String solution, List<String> tags) {
         this.title = title;
+        this.summary = summary;
         this.issue = issue;
+        this.impact = impact;
         this.solution = solution;
         this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
     }

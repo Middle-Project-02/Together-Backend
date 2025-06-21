@@ -47,14 +47,17 @@ public enum ErrorType {
     // 알림장
     NOTIFICATION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당 알림장이 없습니다.", LogLevel.WARN),
     INVALID_NOTIFICATION_TITLE(40402, HttpStatus.BAD_REQUEST, "알림장 제목은 비어 있을 수 없습니다.", LogLevel.WARN),
-    INVALID_NOTIFICATION_ISSUE_OR_SOLUTION(40403, HttpStatus.BAD_REQUEST, "알림장 이슈와 대응 방안은 비어 있을 수 없습니다.", LogLevel.WARN),
+    INVALID_NOTIFICATION_CONTENT(40403, HttpStatus.BAD_REQUEST, "알림장 세부 내용은 비어 있을 수 없습니다.", LogLevel.WARN),
+
+    // 랭킹
+    PLAN_NOT_FOUND(40501, HttpStatus.NOT_FOUND, "존재하지 않는 요금제입니다.", LogLevel.WARN),
 
     // 퀴즈
     QUIZ_NOT_FOUND(40601, HttpStatus.BAD_REQUEST, "해당 퀴즈를 찾을 수 없습니다.", LogLevel.WARN),
     QUIZ_EMPTY(40602, HttpStatus.BAD_REQUEST, "등록된 퀴즈가 없습니다.", LogLevel.WARN),
 
     // FAQ
-    QUESTION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당하는 질문이 없습니다.", LogLevel.WARN);
+    QUESTION_NOT_FOUND(40701, HttpStatus.NOT_FOUND, "해당하는 질문이 없습니다.", LogLevel.WARN);
 
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;
     private final int code;

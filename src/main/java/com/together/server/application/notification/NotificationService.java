@@ -25,13 +25,13 @@ public class NotificationService {
     @Transactional
     public void createNotification(NotificationCreateRequest request) {
         notificationCreateValidator.validate(request);
-        Notification notification = new Notification(request.title(), request.issue(), request.solution(), request.tags());
+        Notification notification = new Notification(request.title(), request.summary(), request.issue(), request.impact(), request.solution(), request.tags());
         notificationRepository.save(notification);
     }
 
     @Transactional(readOnly = true)
     public List<NotificationSimpleResponse> getAllNotifications() {
-        return notificationRepository.findAll().stream()
+        return notificationRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(NotificationSimpleResponse::from)
                 .collect(Collectors.toList());
     }
