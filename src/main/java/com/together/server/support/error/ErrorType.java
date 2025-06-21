@@ -53,6 +53,9 @@ public enum ErrorType {
     QUIZ_NOT_FOUND(40601, HttpStatus.BAD_REQUEST, "해당 퀴즈를 찾을 수 없습니다.", LogLevel.WARN),
     QUIZ_EMPTY(40602, HttpStatus.BAD_REQUEST, "등록된 퀴즈가 없습니다.", LogLevel.WARN);
 
+    // FAQ
+    QUESTION_NOT_FOUND(40401, HttpStatus.NOT_FOUND, "해당하는 질문이 없습니다.", LogLevel.WARN);
+
     public static final ErrorType SOCIAL_LOGIN_ONLY = null;
     private final int code;
     private final HttpStatus status;
