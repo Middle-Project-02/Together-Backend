@@ -21,7 +21,14 @@ public class TemplateService {
 
     @Transactional
     public void saveTemplate(TemplateSaveRequest request, Long memberId) {
-        Template template = new Template(memberId, request.title(), request.content());
+
+        String title = request.title() != null && !request.title().isBlank()
+                ? request.title().trim() : "제목 없음";
+
+        String content = request.content() != null && !request.content().isBlank()
+                ? request.content().trim() : "내용 없음";
+
+        Template template = new Template(memberId, title, content);
         templateRepository.save(template);
     }
 
@@ -56,20 +63,20 @@ public class TemplateService {
         templateRepository.delete(t);
     }
 
-    public TemplateSaveRequest parseTitleAndContent(String raw) {
-        String title = "템플릿 제목";
-        String content = raw;
-
-        int titleStart = raw.indexOf("제목:");
-        int contentStart = raw.indexOf("내용:");
-
-        if (titleStart != -1 && contentStart != -1 && titleStart < contentStart) {
-            String extractedTitle = raw.substring(titleStart + 3, contentStart).trim();
-            String extractedContent = raw.substring(contentStart + 3).trim();
-            if (!extractedTitle.isEmpty()) title = extractedTitle;
-            if (!extractedContent.isEmpty()) content = extractedContent;
-        }
-
-        return new TemplateSaveRequest(title, content);
-    }
+//    public TemplateSaveRequest parseTitleAndContent(String raw) {
+//        String title = "템플릿 제목";
+//        String content = raw;
+//
+//        int titleStart = raw.indexOf("제목:");
+//        int contentStart = raw.indexOf("내용:");
+//
+//        if (titleStart != -1 && contentStart != -1 && titleStart < contentStart) {
+//            String extractedTitle = raw.substring(titleStart + 3, contentStart).trim();
+//            String extractedContent = raw.substring(contentStart + 3).trim();
+//            if (!extractedTitle.isEmpty()) title = extractedTitle;
+//            if (!extractedContent.isEmpty()) content = extractedContent;
+//        }
+//
+//        return new TemplateSaveRequest(title, content);
+//    }
 }

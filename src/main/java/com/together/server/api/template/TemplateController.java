@@ -25,7 +25,7 @@ public class TemplateController {
 
     @PostMapping
     @Operation(summary = "템플릿 저장", description = "추천 요금제 정보를 템플릿으로 저장")
-    public ResponseEntity<ApiResponse<Void>> saveTemplate(@RequestBody String rawContent,
+    public ResponseEntity<ApiResponse<Void>> saveTemplate(@RequestBody TemplateSaveRequest request,
     @AuthenticationPrincipal Accessor accessor) {
 
         if (accessor.isGuest()) {
@@ -33,8 +33,7 @@ public class TemplateController {
         }
 
         Long memberId = Long.valueOf(accessor.id());
-        TemplateSaveRequest parsed = templateService.parseTitleAndContent(rawContent);
-        templateService.saveTemplate(parsed, memberId);
+        templateService.saveTemplate(request, memberId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
