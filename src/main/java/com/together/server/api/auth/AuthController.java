@@ -3,6 +3,7 @@ package com.together.server.api.auth;
 import com.together.server.application.auth.AuthService;
 import com.together.server.application.auth.KakaoService;
 import com.together.server.application.auth.request.FirstLoginRequest;
+import com.together.server.application.auth.request.KakaoCodeRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
 import com.together.server.application.auth.response.*;
@@ -62,10 +63,13 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @GetMapping("/login/kakao")
-    @Operation(summary = "카카오 로그인", description = "사용자 카카오 로그인으로 JWT 토큰 발급")
-    public ResponseEntity<ApiResponse<LoginViewResponse>> kakaoLogin(@RequestParam String code, HttpServletResponse response) {
-        String kakaoAccessToken = kakaoOAuthClient.getAccessToken(code);
+    @PostMapping("/login/kakao")
+    @Operation(summary = "카카오 로그인", description = "클라이언트에서 받은 인가코드로 JWT 발급")
+    public ResponseEntity<ApiResponse<LoginViewResponse>> kakaoLogin(
+            @RequestBody KakaoCodeRequest request,
+            HttpServletResponse response
+    ) {
+        String kakaoAccessToken = kakaoOAuthClient.getAccessToken(request.code());
         KakaoUserResponse kakaoUser = kakaoService.getKakaoUser(kakaoAccessToken);
         KakaoLoginResponse kakaoLogin = authService.kakaoLogin(kakaoUser);
 
