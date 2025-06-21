@@ -62,21 +62,4 @@ public class TemplateService {
 
         templateRepository.delete(t);
     }
-
-//    public TemplateSaveRequest parseTitleAndContent(String raw) {
-//        String title = "템플릿 제목";
-//        String content = raw;
-//
-//        int titleStart = raw.indexOf("제목:");
-//        int contentStart = raw.indexOf("내용:");
-//
-//        if (titleStart != -1 && contentStart != -1 && titleStart < contentStart) {
-//            String extractedTitle = raw.substring(titleStart + 3, contentStart).trim();
-//            String extractedContent = raw.substring(contentStart + 3).trim();
-//            if (!extractedTitle.isEmpty()) title = extractedTitle;
-//            if (!extractedContent.isEmpty()) content = extractedContent;
-//        }
-//
-//        return new TemplateSaveRequest(title, content);
-//    }
 }
