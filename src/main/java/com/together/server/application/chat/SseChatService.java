@@ -40,6 +40,7 @@ public class SseChatService {
         SseEmitter emitter = sseEmitterService.createEmitter(userId);
         ChatSession session = new ChatSession(userId, emitter);
         chatSessions.put(userId, session);
+        sendEvent(userId, "answer", "안녕하세요! 요금제 추천 도우미예요 😊 궁금한 점을 물어봐 주세요!");
         return emitter;
     }
 
@@ -122,7 +123,8 @@ public class SseChatService {
                 sendEvent(userId, "done", "done");
             }
         } else {
-            sendEvent(userId, "stream_chat", "답변 감사합니다! 😊\n말씀해주신 정보를 바탕으로 요금제를 추천해드릴게요. 잠시만 기다려주세요.");
+            sendEvent(userId, "stream_chat", "아래는 가장 적합한 요금제입니다!" +
+                    "");
             try {
                 List<Map<String, String>> planList = smartChoiceClient.getPlans(
                         session.getUserCondition().get("voice"),
@@ -143,7 +145,7 @@ public class SseChatService {
                 }
 
                 SmartChoicePlan plan = SmartChoicePlan.from(lowestLguPlan.get());
-                session.setRecommendedPlan(plan); // ⭐ 추천 요금제 세션에 저장
+                session.setRecommendedPlan(plan);
                 sseEmitterService.sendEvent(userId, "recommend_result", List.of(plan));
                 sendEvent(userId, "done", "done");
 

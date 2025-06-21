@@ -100,7 +100,7 @@ public class OpenAiChatClient {
                 }
             }
         } catch (Exception e) {
-             log.warn("JSON 파싱 실패", e);
+             //log.warn("JSON 파싱 실패", e);
         }
         return result;
     }
