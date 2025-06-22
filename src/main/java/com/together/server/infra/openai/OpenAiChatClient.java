@@ -74,7 +74,21 @@ public class OpenAiChatClient {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-3.5-turbo");
         body.put("messages", List.of(
-                Map.of("role", "system", "content", "사용자의 문장에서 아래 항목들을 JSON 형태로 추출해줘. 없는 항목은 null로 채워줘. { \"voice\": \"\", \"data\": \"\", \"sms\": \"\", \"age\": \"\", \"type\": \"\" }"),
+                Map.of("role", "system", "content",
+                        String.join("\n",
+                                "아래 문장에서 요금제 추천에 필요한 정보를 추출해서 JSON으로 만들어줘.",
+                                "JSON 키: { \"voice\": \"\", \"data\": \"\", \"sms\": \"\", \"age\": \"\", \"type\": \"\" }",
+                                "",
+                                "- 통화(voice): 하루 또는 한 달 기준 통화 시간 (분)",
+                                "- 데이터(data): 하루 또는 한 달 기준 유튜브/인터넷 사용 시간 (분 또는 시간)",
+                                "- 문자(sms): 하루 또는 한 달 문자 개수",
+                                "- 나이(age): 숫자 (예: 75)",
+                                "- 통신망(type): LTE / 5G / 3G",
+                                "",
+                                "단위가 없으면 하루 기준으로 간주하고, 월 기준으로 환산하지 말고 그대로 값만 추출해줘.",
+                                "없으면 null로 채워줘."
+                        )
+                ),
                 Map.of("role", "user", "content", prompt)
         ));
 
@@ -109,6 +123,7 @@ public class OpenAiChatClient {
         if (raw == null) return null;
 
         String lower = raw.toLowerCase();
+
         if (lower.contains("무제한")) {
             return "999999";
         }
@@ -126,14 +141,30 @@ public class OpenAiChatClient {
         }
 
         String digits = raw.replaceAll("[^\\d]", "");
+        int value = digits.isEmpty() ? -1 : Integer.parseInt(digits);
 
-        if (key.equals("data") && !digits.isEmpty()) {
-            int mb = Integer.parseInt(digits) * 1000;
-            return String.valueOf(mb);
+        // 하루 단위 입력일 경우 → 한 달로 변환
+        if (value > 0) {
+            if (key.equals("voice") && lower.contains("하루")) {
+                return String.valueOf(value * 30); // 하루 통화 → 월 통화(분)
+            }
+            if (key.equals("sms") && lower.contains("하루")) {
+                return String.valueOf(value * 30); // 하루 문자 → 월 문자(건)
+            }
+            if (key.equals("data") && lower.contains("유튜브") || lower.contains("하루")) {
+                int mbPerHour = 300; // 예: 유튜브 1시간 ≒ 300MB
+                return String.valueOf(value * mbPerHour * 30); // 하루 n시간 → 월 MB
+            }
+        }
+
+        // 일반 MB 단위 데이터
+        if (key.equals("data") && !digits.isEmpty() && !lower.contains("하루")) {
+            return String.valueOf(Integer.parseInt(digits) * 1000); // GB → MB
         }
 
         return digits.isEmpty() ? null : digits;
     }
+
 
     private String extractStreamText(String json) {
         try {
