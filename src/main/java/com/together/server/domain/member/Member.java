@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     private String preferredPrice;
 
     @Column(name = "font_mode")
-    private String fontMode;
+    private Boolean fontMode;
 
     @Column(name = "is_first_login", nullable = false)
     private Boolean isFirstLogin = true;
@@ -44,12 +44,12 @@ public class Member extends BaseEntity {
         this.password = password;
         this.isFirstLogin = true;
         this.delflag = false;
+        this.fontMode = false;
     }
 
-    public void updateFirstLoginInfo(Integer ageGroup, String preferredPrice, Boolean fontMode) {
-        this.ageGroup = ageGroup;
-        this.preferredPrice = preferredPrice;
-        this.fontMode = String.valueOf(fontMode);
+
+    public void updateFirstLoginInfo(Boolean fontMode) {
+        this.fontMode = fontMode;
         this.isFirstLogin = false;
     }
 
@@ -61,7 +61,7 @@ public class Member extends BaseEntity {
         this.preferredPrice = preferredPrice;
     }
 
-    public void updateFontMode(String fontMode) {
+    public void updateFontMode(Boolean fontMode) {
         this.fontMode = fontMode;
     }
 

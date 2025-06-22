@@ -3,10 +3,7 @@ package com.together.server.application.auth;
 import com.together.server.application.auth.request.FirstLoginRequest;
 import com.together.server.application.auth.request.LoginRequest;
 import com.together.server.application.auth.request.RegisterRequest;
-import com.together.server.application.member.request.UpdateMemberInfoRequest;
-import com.together.server.application.auth.response.KakaoUserResponse;
-import com.together.server.application.auth.response.MemberDetailsResponse;
-import com.together.server.application.auth.response.TokenResponse;
+import com.together.server.application.auth.response.*;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.domain.member.Member;
 import com.together.server.domain.member.MemberRepository;
@@ -41,7 +38,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         Member member = getByMemberId(request.memberId());
 
         if (!memberRepository.existsByMemberId(request.memberId())) {
@@ -63,7 +60,7 @@ public class AuthService {
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
 
-        return new TokenResponse(accessToken, refreshToken);
+        return new LoginResponse(accessToken, refreshToken, member.getIsFirstLogin());
     }
 
     @Transactional
@@ -75,10 +72,9 @@ public class AuthService {
         Member savedMember = memberRepository.save(member);
 
         return new MemberInfoResponse(
-                savedMember.getId(),
                 savedMember.getMemberId(),
                 savedMember.getNickname(),
-                savedMember.getCreatedAt()
+                Boolean.TRUE.equals(savedMember.getFontMode())
         );
     }
 
@@ -89,7 +85,7 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse kakaoLogin(KakaoUserResponse kakaoUser) {
+    public KakaoLoginResponse kakaoLogin(KakaoUserResponse kakaoUser) {
         if (kakaoUser.email() == null || kakaoUser.nickname() == null) {
             throw new CoreException(ErrorType.KAKAO_USERINFO_INCOMPLETE);
         }
@@ -111,7 +107,7 @@ public class AuthService {
 
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
-        return new TokenResponse(accessToken, refreshToken);
+        return new KakaoLoginResponse(accessToken, refreshToken, member.getIsFirstLogin());
     }
 
     @Transactional
@@ -140,11 +136,7 @@ public class AuthService {
         }
         firstLoginValidator.validate(request);
 
-        member.updateFirstLoginInfo(
-                request.ageGroup(),
-                request.preferredPrice(),
-                request.fontMode()
-        );
+        member.updateFirstLoginInfo(request.fontMode());
     }
 
 }
