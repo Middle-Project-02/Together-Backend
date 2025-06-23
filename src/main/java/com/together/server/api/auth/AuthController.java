@@ -48,7 +48,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(ApiResponse.success(new LoginViewResponse(response.isFirstLogin())));
+                .body(ApiResponse.success(new LoginViewResponse(response.isFirstLogin(), response.fontMode())));
     }
 
     @PatchMapping("/firstLogin")
@@ -78,7 +78,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(ApiResponse.success(new LoginViewResponse(kakaoLogin.isFirstLogin())));
+                .body(ApiResponse.success(new LoginViewResponse(kakaoLogin.isFirstLogin(), kakaoLogin.fontMode())));
     }
 
 
