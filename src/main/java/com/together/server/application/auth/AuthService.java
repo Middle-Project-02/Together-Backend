@@ -60,7 +60,7 @@ public class AuthService {
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
 
-        return new LoginResponse(accessToken, refreshToken, member.getIsFirstLogin());
+        return new LoginResponse(accessToken, refreshToken, member.getIsFirstLogin(), member.getFontMode());
     }
 
     @Transactional
@@ -107,7 +107,7 @@ public class AuthService {
 
         String accessToken = tokenProvider.createToken(member.getId().toString());
         String refreshToken = tokenProvider.createRefreshToken(member.getId().toString());
-        return new KakaoLoginResponse(accessToken, refreshToken, member.getIsFirstLogin());
+        return new KakaoLoginResponse(accessToken, refreshToken, member.getIsFirstLogin(), member.getFontMode());
     }
 
     @Transactional

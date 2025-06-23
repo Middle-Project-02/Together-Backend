@@ -1,6 +1,7 @@
 package com.together.server.application.auth.response;
 
 public record LoginViewResponse(
-        boolean isFirstLogin
+        boolean isFirstLogin,
+        boolean fontMode
 ) {
 }
