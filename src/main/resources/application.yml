@@ -56,7 +56,7 @@ security:
       refresh-key: refresh_token
       http-only: true
       secure: true
-      domain: localhost
+      domain: https://together2.netlify.app
       path: /
       max-age: 86400 # 1 day
       refresh-max-age: 604800 # 7 days
