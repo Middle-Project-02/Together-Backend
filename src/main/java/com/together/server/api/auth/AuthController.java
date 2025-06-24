@@ -113,11 +113,12 @@ public class AuthController {
 
     @PostMapping("/memberId")
     @Operation(summary = "전화번호(아이디) 중복 확인", description = "회원가입 전 전화번호 중복 여부를 확인합니다.")
-    public ResponseEntity<ApiResponse<CheckMemberIdResponse>> checkDuplicatedMemberId(
+    public ResponseEntity<ApiResponse<Void>> checkDuplicatedMemberId(
             @RequestBody CheckMemberIdRequest request
     ) {
-        CheckMemberIdResponse response = authService.checkDuplicatedMemberId(request.memberId());
-        return ResponseEntity.ok(ApiResponse.success(response));
+        authService.checkDuplicatedMemberId(request.memberId());
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
+
 
 }

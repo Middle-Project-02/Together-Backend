@@ -140,9 +140,12 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public CheckMemberIdResponse checkDuplicatedMemberId(String memberId) {
+    public void checkDuplicatedMemberId(String memberId) {
         boolean exists = memberRepository.existsByMemberId(memberId);
-        return new CheckMemberIdResponse(exists);
+
+        if (exists) {
+            throw new CoreException(ErrorType.MEMBER_PHONE_NUMBER_ALREADY_EXISTS);
+        }
     }
 
 }
