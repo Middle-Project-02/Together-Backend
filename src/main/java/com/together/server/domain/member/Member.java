@@ -38,6 +38,9 @@ public class Member extends BaseEntity {
     @Column(name = "delflag", nullable = false)
     private Boolean delflag = false;
 
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     public Member(String memberId, String nickname, String password) {
         this.memberId = memberId;
         this.nickname = nickname;
@@ -73,4 +76,7 @@ public class Member extends BaseEntity {
         this.delflag = true;
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

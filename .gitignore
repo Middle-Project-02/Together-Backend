@@ -37,3 +37,6 @@ out/
 .vscode/
 src/main/resources/application.yml
 node_modules
+
+### Firebase service account key
+src/main/resources/firebase/firebase-adminsdk.json
