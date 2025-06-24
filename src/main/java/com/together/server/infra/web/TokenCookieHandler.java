@@ -28,6 +28,7 @@ public class TokenCookieHandler {
                 .secure(properties.secure())
                 .domain(properties.domain())
                 .path(properties.path())
+                .sameSite("None")
                 .maxAge(properties.maxAge())
                 .build();
     }
@@ -38,6 +39,7 @@ public class TokenCookieHandler {
                 .secure(properties.secure())
                 .domain(properties.domain())
                 .path(properties.path())
+                .sameSite("None")
                 .maxAge(0)
                 .build();
     }
@@ -68,6 +70,7 @@ public class TokenCookieHandler {
                 .secure(properties.secure())
                 .domain(properties.domain())
                 .path(properties.path())
+                .sameSite("None")
                 .maxAge(properties.refreshMaxAge())
                 .build();
     }
@@ -78,6 +81,7 @@ public class TokenCookieHandler {
                 .secure(properties.secure())
                 .domain(properties.domain())
                 .path(properties.path())
+                .sameSite("None")
                 .maxAge(0)
                 .build();
     }
