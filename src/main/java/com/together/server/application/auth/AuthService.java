@@ -139,4 +139,10 @@ public class AuthService {
         member.updateFirstLoginInfo(request.fontMode());
     }
 
+    @Transactional(readOnly = true)
+    public CheckMemberIdResponse checkDuplicatedMemberId(String memberId) {
+        boolean exists = memberRepository.existsByMemberId(memberId);
+        return new CheckMemberIdResponse(exists);
+    }
+
 }
