@@ -139,4 +139,13 @@ public class AuthService {
         member.updateFirstLoginInfo(request.fontMode());
     }
 
+    @Transactional(readOnly = true)
+    public void checkDuplicatedMemberId(String memberId) {
+        boolean exists = memberRepository.existsByMemberId(memberId);
+
+        if (exists) {
+            throw new CoreException(ErrorType.MEMBER_PHONE_NUMBER_ALREADY_EXISTS);
+        }
+    }
+
 }
