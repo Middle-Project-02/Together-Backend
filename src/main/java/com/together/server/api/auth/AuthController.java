@@ -2,10 +2,7 @@ package com.together.server.api.auth;
 
 import com.together.server.application.auth.AuthService;
 import com.together.server.application.auth.KakaoService;
-import com.together.server.application.auth.request.FirstLoginRequest;
-import com.together.server.application.auth.request.KakaoCodeRequest;
-import com.together.server.application.auth.request.LoginRequest;
-import com.together.server.application.auth.request.RegisterRequest;
+import com.together.server.application.auth.request.*;
 import com.together.server.application.auth.response.*;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.infra.oauth.KakaoOAuthClient;
@@ -113,4 +110,15 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString())
                 .body(ApiResponse.success(null));
     }
+
+    @PostMapping("/memberId")
+    @Operation(summary = "전화번호(아이디) 중복 확인", description = "회원가입 전 전화번호 중복 여부를 확인합니다.")
+    public ResponseEntity<ApiResponse<Void>> checkDuplicatedMemberId(
+            @RequestBody CheckMemberIdRequest request
+    ) {
+        authService.checkDuplicatedMemberId(request.memberId());
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+
 }
