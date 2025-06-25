@@ -68,3 +68,7 @@ openai:
 smartchoice:
   api:
     key: ${SMARTCHOICE_API_KEY}
+
+firebase:
+  config:
+    base64: ${FIREBASE_CONFIG_BASE64:}
