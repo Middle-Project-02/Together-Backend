@@ -60,4 +60,12 @@ public class MemberService {
 
         member.delete();
     }
+
+    @Transactional
+    public void saveFcmToken(String memberId, String fcmToken) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CoreException(ErrorType.MEMBER_NOT_FOUND));
+        member.updateFcmToken(fcmToken);
+    }
+
 }

@@ -59,7 +59,8 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/api/auth/login/kakao/**",
-                                "/api/ranking/**"
+                                "/api/ranking/**",
+                                "/api/auth/memberId"
                 ).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(it -> it

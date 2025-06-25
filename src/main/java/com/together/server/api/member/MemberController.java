@@ -1,6 +1,7 @@
 package com.together.server.api.member;
 
 import com.together.server.application.member.MemberService;
+import com.together.server.application.member.request.FcmTokenRequest;
 import com.together.server.application.member.request.UpdateMemberInfoRequest;
 import com.together.server.application.member.response.MemberInfoResponse;
 import com.together.server.application.member.response.UpdateMemberInfoResponse;
@@ -53,6 +54,13 @@ public class MemberController {
         }
         String memberId = accessor.id();
         memberService.deleteMember(memberId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/fcm-token")
+    public ResponseEntity<ApiResponse<Void>> saveFcmToken(@RequestBody FcmTokenRequest request, @AuthenticationPrincipal Accessor accessor) {
+        String memberId = accessor.id();
+        memberService.saveFcmToken(memberId, request.fcmToken());
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
