@@ -25,6 +25,7 @@ public class RankingPlanDetailResponse {
     private final String description;
     private final String regularPrice;
     private final String dataAmount;
+    private final String speedLimit;
     private final Integer dataAmountGb;
     private final DataType dataType;
     private final Map<String, Object> allBenefits;
@@ -35,6 +36,7 @@ public class RankingPlanDetailResponse {
         this.description = plan.getDescription();
         this.regularPrice = plan.getRegularPrice();
         this.dataAmount = plan.getDataAmount();
+        this.speedLimit = plan.getSpeedLimit();
         this.dataAmountGb = plan.getDataAmountGb();
         this.dataType = plan.getDataType();
         this.allBenefits = parseAllBenefits(plan.getAllBenefits());
